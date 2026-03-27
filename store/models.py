@@ -6,7 +6,7 @@ class Category(models.Model):
     slug = models.SlugField(unique=True, blank=True)
     description = models.TextField(blank=True)
     image = models.ImageField(upload_to='categories/', blank=True, null=True)
-    icon = models.CharField(max_length=10, default='⚽')
+    icon = models.CharField(max_length=50, blank=True, default='', help_text='Optional Font Awesome class e.g. fa-futbol')
     bg_color = models.CharField(max_length=7, default='#0d2b4a')
     order = models.PositiveIntegerField(default=0)
     active = models.BooleanField(default=True)
