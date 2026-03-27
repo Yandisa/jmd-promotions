@@ -87,7 +87,7 @@
       <form method="post">
         {% csrf_token %}
 
-        <div class="form-section-title">👤 Your Details</div>
+        <div class="form-section-title"><i class="fa-solid fa-user"></i> Your Details</div>
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Your Name *</label>
@@ -107,15 +107,15 @@
           </div>
         </div>
 
-        <div class="form-section-title">🛒 Order Details</div>
+        <div class="form-section-title"><i class="fa-solid fa-cart-shopping"></i> Order Details</div>
 
         {% if cart_items %}
         <!-- Cart items are pre-loaded — show a read-only summary and hidden notes -->
         <div style="background:rgba(240,165,0,.07);border:1px solid rgba(240,165,0,.25);border-radius:6px;padding:16px 20px;margin-bottom:20px">
-          <p style="font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px">✅ Items from your cart (auto-filled)</p>
+          <p style="font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px"><i class="fa-solid fa-circle-check"></i> Items from your cart (auto-filled)</p>
           {% for item in cart_items %}
           <div style="display:flex;justify-content:space-between;font-size:.86rem;color:var(--dark-grey);padding:5px 0;border-bottom:1px solid rgba(240,165,0,.12)">
-            <span><strong>{{ item.product.name }}</strong> × {{ item.qty }}{% if item.size %} — Size: {{ item.size }}{% endif %}{% if item.colour %} — Colour: {{ item.colour }}{% endif %}</span>
+            <span><strong>{{ item.product.name }}</strong> <i class="fa-solid fa-xmark"></i> {{ item.qty }}{% if item.size %} — Size: {{ item.size }}{% endif %}{% if item.colour %} — Colour: {{ item.colour }}{% endif %}</span>
             <span style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--navy)">R{{ item.subtotal|floatformat:2 }}</span>
           </div>
           {% endfor %}
@@ -164,13 +164,13 @@
           </div>
         </div>
 
-        <div class="form-section-title">📐 Sizing & Branding</div>
+        <div class="form-section-title"><i class="fa-solid fa-ruler"></i> Sizing & Branding</div>
         <div class="form-row single">
           <div class="form-group">
             <label class="form-label">Size Breakdown</label>
             <input type="text" name="sizes_breakdown" class="form-control"
                    value="{{ cart_sizes_prefill }}"
-                   placeholder="e.g. 5×XS, 10×S, 8×M, 6×L, 4×XL, 2×XXL"/>
+                   placeholder="e.g. 5<i class="fa-solid fa-xmark"></i>XS, 10<i class="fa-solid fa-xmark"></i>S, 8<i class="fa-solid fa-xmark"></i>M, 6<i class="fa-solid fa-xmark"></i>L, 4<i class="fa-solid fa-xmark"></i>XL, 2<i class="fa-solid fa-xmark"></i>XXL"/>
           </div>
         </div>
         <div class="form-row single">
@@ -183,7 +183,7 @@
 
         <div class="submit-area">
           <button type="submit" class="submit-btn">
-            ⚡ Submit Quote Request
+            <i class="fa-solid fa-bolt"></i> Submit Quote Request
           </button>
           <p class="submit-note">
             We'll respond within 48 hours with a formal quote.
@@ -202,7 +202,7 @@
     <!-- Cart preview -->
     <div class="panel-box">
       <div class="panel-head">
-        🛒 Your Cart
+        <i class="fa-solid fa-cart-shopping"></i> Your Cart
         {% if cart_items %}<span class="badge">{{ cart_items|length }} item{{ cart_items|length|pluralize }}</span>{% endif %}
       </div>
       <div class="panel-body">
@@ -213,7 +213,7 @@
               {% if item.product.image %}
                 <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}"/>
               {% else %}
-                {{ item.product.category.icon }}
+                <i class="fa-solid {{ item.product.category.icon }}"></i>
               {% endif %}
             </div>
             <div class="cpi-info">
@@ -273,7 +273,7 @@
          style="width:100%;justify-content:center;display:flex"
          target="_blank"
          rel="noopener">
-        💬 WhatsApp Us Instead
+        <i class="fa-brands fa-whatsapp"></i> WhatsApp Us Instead
       </a>
     </div>
 
@@ -289,7 +289,7 @@
 (function(){
   var items = [
     {% for item in cart_items %}
-    "{{ item.qty }}× {{ item.product.name }}{% if item.size %} ({{ item.size }}){% endif %}{% if item.colour %} [{{ item.colour }}]{% endif %} — R{{ item.subtotal|floatformat:2 }}"{% if not forloop.last %},{% endif %}
+    "{{ item.qty }}<i class="fa-solid fa-xmark"></i> {{ item.product.name }}{% if item.size %} ({{ item.size }}){% endif %}{% if item.colour %} [{{ item.colour }}]{% endif %} — R{{ item.subtotal|floatformat:2 }}"{% if not forloop.last %},{% endif %}
     {% endfor %}
   ];
   var msg = "Hi JMD Promotions, I'd like to request a quote:\n\n" + items.join("\n") + "\n\nTotal: {{ cart_total }} (excl. VAT)\n\nPlease contact me to confirm details.";
