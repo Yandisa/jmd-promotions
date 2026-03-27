@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+{% block title %}Your Cart – {{ site.site_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.cart-page{max-width:1200px;margin:0 auto;padding:48px;display:grid;grid-template-columns:1fr 360px;gap:36px;align-items:start}
+.cart-table-wrap{background:#fff;border-radius:8px;box-shadow:0 2px 20px rgba(10,22,40,.08);overflow:hidden}
+.cart-table-head{display:grid;grid-template-columns:1fr 160px 130px 48px;padding:13px 24px;background:var(--secondary);color:rgba(245,245,240,.5);font-size:.63rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase}
+.cart-row{display:grid;grid-template-columns:1fr 160px 130px 48px;padding:18px 24px;border-bottom:1px solid rgba(10,22,40,.07);align-items:center;transition:background .15s}
+.cart-row:hover{background:rgba(240,165,0,.025)}
+.cart-row:last-child{border-bottom:none}
+.cart-product{display:flex;align-items:flex-start;gap:14px}
+.cart-thumb{width:68px;height:68px;border-radius:5px;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:1.8rem}
+.cart-thumb img{width:100%;height:100%;object-fit:cover}
+.cart-item-name{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;color:var(--navy);line-height:1.3;margin-bottom:3px}
+.cart-item-cat{font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.cart-unit-price{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--grey);margin-top:3px}
+
+/* inline size/colour selects */
+.cart-options{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.cart-inline-select{padding:5px 24px 5px 9px;border:1px solid rgba(10,22,40,.18);border-radius:4px;font-family:'Barlow',sans-serif;font-size:.75rem;color:var(--navy);background:#fff;outline:none;cursor:pointer;transition:border-color .2s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%238a8f9a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;min-width:100px}
+.cart-inline-select:focus{border-color:{{ site.primary_color }};box-shadow:0 0 0 2px rgba(214,40,40,.1)}
+.cart-inline-select.missing{border-color:{{ site.primary_color }};background-color:rgba(214,40,40,.05)}
+
+/* qty control */
+.qty-control{display:flex;align-items:center;gap:5px;justify-content:center}
+.qty-btn{width:26px;height:26px;border:1px solid rgba(10,22,40,.15);background:#fff;border-radius:4px;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;color:var(--navy);line-height:1;padding:0}
+.qty-btn:hover{border-color:{{ site.primary_color }};color:{{ site.primary_color }}}
+.qty-field{width:42px;padding:4px;border:1px solid rgba(10,22,40,.15);border-radius:4px;text-align:center;font-family:'Barlow',sans-serif;font-size:.9rem;font-weight:700;color:var(--navy);outline:none}
+.qty-field:focus{border-color:{{ site.primary_color }}}
+
+.cart-subtotal{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--navy);text-align:right}
+.cart-subtotal small{font-family:'Barlow',sans-serif;font-size:.58rem;color:var(--grey);display:block}
+.remove-btn{background:none;border:none;color:rgba(10,22,40,.22);font-size:1rem;cursor:pointer;padding:6px;border-radius:4px;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.remove-btn:hover{color:{{ site.primary_color }};background:rgba(214,40,40,.07)}
+.cart-footer-row{padding:16px 24px;background:var(--offwhite);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-top:1px solid rgba(10,22,40,.07)}
+
+/* info box */
+.info-box{margin-top:18px;background:#fff;border-radius:8px;padding:24px 28px;box-shadow:0 2px 16px rgba(10,22,40,.06);border-left:4px solid var(--accent)}
+.info-box h3{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.info-box p,.info-box ol{font-size:.86rem;color:var(--dark-grey);line-height:1.75;margin-bottom:8px}
+.info-box ol{padding-left:18px}
+.info-box ol li strong{color:var(--navy)}
+
+/* order summary */
+.order-summary{background:#fff;border-radius:8px;box-shadow:0 2px 20px rgba(10,22,40,.08);overflow:hidden;position:sticky;top:110px}
+.summary-head{background:linear-gradient(135deg,var(--secondary),#0e2f5a);padding:20px 26px}
+.summary-head h3{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#fff;letter-spacing:.04em;margin-bottom:2px}
+.summary-head p{font-size:.7rem;color:rgba(245,245,240,.45)}
+.summary-body{padding:20px 26px}
+.sum-line{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px;font-size:.85rem}
+.sum-line .lbl{color:var(--grey)}.sum-line .val{font-weight:600;color:var(--navy)}
+.sum-divider{border:none;border-top:1px solid rgba(10,22,40,.09);margin:12px 0}
+.sum-total{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+.sum-total .lbl{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--navy)}
+.sum-total .val{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:{{ site.primary_color }}}
+.sum-note{font-size:.7rem;color:var(--grey);line-height:1.55;margin-bottom:20px}
+.sum-actions{display:flex;flex-direction:column;gap:9px}
+.btn-quote{background:linear-gradient(135deg,{{ site.primary_color }},#e05050);color:#fff;border:none;padding:14px;border-radius:6px;font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;text-decoration:none;box-shadow:0 4px 14px rgba(214,40,40,.25)}
+.btn-quote:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(214,40,40,.38);color:#fff}
+.btn-whatsapp{background:#25D366;color:#fff;border:none;padding:14px;border-radius:6px;font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;text-decoration:none;box-shadow:0 4px 14px rgba(37,211,102,.25)}
+.btn-whatsapp:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(37,211,102,.38);color:#fff}
+.btn-keep{background:transparent;color:var(--navy);border:2px solid rgba(10,22,40,.14);padding:11px;border-radius:6px;font-family:'Barlow',sans-serif;font-size:.74rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;text-decoration:none}
+.btn-keep:hover{border-color:{{ site.primary_color }};color:{{ site.primary_color }}}
+.next-steps{margin-top:18px;border-top:1px solid rgba(10,22,40,.08);padding-top:16px}
+.next-steps h4{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.ns-item{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start}
+.ns-num{width:20px;height:20px;border-radius:50%;background:var(--secondary);color:var(--accent);font-family:'Bebas Neue',sans-serif;font-size:.75rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.ns-text{font-size:.76rem;color:var(--grey);line-height:1.5}.ns-text strong{color:var(--dark-grey);font-weight:600}
+
+.empty-cart{grid-column:1/-1;text-align:center;padding:100px 40px;background:#fff;border-radius:8px;box-shadow:0 2px 20px rgba(10,22,40,.08)}
+.empty-icon{font-size:5rem;opacity:.2;margin-bottom:18px;display:block}
+.empty-cart h2{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;color:var(--navy);letter-spacing:.04em;margin-bottom:8px}
+.empty-cart p{color:var(--grey);font-size:.95rem;font-weight:300;margin-bottom:26px}
+
+@media(max-width:960px){.cart-page{grid-template-columns:1fr;padding:24px 20px}.order-summary{position:static}}
+@media(max-width:640px){.cart-table-head{display:none}.cart-row{grid-template-columns:1fr auto;row-gap:10px}.qty-control{justify-content:flex-start}.cart-subtotal{text-align:right}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-eyebrow">JMD Promotions</div>
+    <h1>Your Cart{% if cart_count %} <span style="font-size:1.5rem;color:var(--accent);font-family:'Barlow',sans-serif;font-weight:300">— {{ cart_count }} item{{ cart_count|pluralize }}</span>{% endif %}</h1>
+    <div class="breadcrumb"><a href="/">Home</a><span class="bc-sep">/</span><a href="/shop/">Shop</a><span class="bc-sep">/</span><span>Cart</span></div>
+  </div>
+</div>
+
+<div class="cart-page">
+{% if items %}
+
+  <!-- ── ITEMS ── -->
+  <div>
+    <form method="post" action="{% url 'cart_update' %}" id="cartForm">
+      {% csrf_token %}
+      <div class="cart-table-wrap">
+        <div class="cart-table-head">
+          <span>Product</span>
+          <span style="text-align:center">Size &amp; Colour</span>
+          <span style="text-align:right">Subtotal</span>
+          <span></span>
+        </div>
+
+        {% for item in items %}
+        <div class="cart-row">
+
+          <!-- Product + inline selects -->
+          <div class="cart-product">
+            <div class="cart-thumb" style="background:{{ item.product.category.bg_color }}">
+              {% if item.product.image %}<img src="{{ item.product.image.url }}" alt="{{ item.product.name }}"/>
+              {% else %}{{ item.product.category.icon }}{% endif %}
+            </div>
+            <div style="flex:1;min-width:0">
+              <div class="cart-item-name">
+                <a href="{{ item.product.get_absolute_url }}" style="color:inherit">{{ item.product.name }}</a>
+              </div>
+              <div class="cart-item-cat">{{ item.product.category.name }}</div>
+              <div class="cart-unit-price">R{{ item.product.display_price }} each</div>
+
+              <!-- SIZE + COLOUR — always editable inline -->
+              <div class="cart-options">
+                <select name="size_{{ item.product.id }}" class="cart-inline-select {% if not item.size %}missing{% endif %}" title="Size">
+                  <option value="">📐 Size?</option>
+                  {% if item.product.sizes_list %}
+                    {% for s in item.product.sizes_list %}
+                    <option value="{{ s }}" {% if item.size == s %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                  {% else %}
+                    {% for s in default_sizes %}
+                    <option value="{{ s }}" {% if item.size == s %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                  {% endif %}
+                  <option value="Mixed/TBC" {% if item.size == 'Mixed/TBC' %}selected{% endif %}>Mixed/TBC</option>
+                </select>
+
+                <select name="colour_{{ item.product.id }}" class="cart-inline-select {% if not item.colour %}missing{% endif %}" title="Colour">
+                  <option value="">🎨 Colour?</option>
+                  {% if item.product.colours_list %}
+                    {% for c in item.product.colours_list %}
+                    <option value="{{ c }}" {% if item.colour == c %}selected{% endif %}>{{ c }}</option>
+                    {% endfor %}
+                  {% else %}
+                    {% for c in default_colours %}
+                    <option value="{{ c }}" {% if item.colour == c %}selected{% endif %}>{{ c }}</option>
+                    {% endfor %}
+                  {% endif %}
+                  <option value="Custom/TBC" {% if item.colour == 'Custom/TBC' %}selected{% endif %}>Custom/TBC</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Qty -->
+          <div class="qty-control" style="justify-content:center">
+            <button type="button" class="qty-btn" onclick="adjustQty('qty_{{ item.product.id }}', -1)">−</button>
+            <input type="number" name="qty_{{ item.product.id }}" id="qty_{{ item.product.id }}"
+                   value="{{ item.qty }}" min="0" class="qty-field" onchange="scheduleUpdate()"/>
+            <button type="button" class="qty-btn" onclick="adjustQty('qty_{{ item.product.id }}', 1)">+</button>
+          </div>
+
+          <!-- Subtotal -->
+          <div class="cart-subtotal">R{{ item.subtotal|floatformat:2 }}<small>excl. VAT</small></div>
+
+          <!-- Remove -->
+          <a href="{% url 'cart_remove' item.product.id %}" class="remove-btn" title="Remove">✕</a>
+        </div>
+        {% endfor %}
+
+        <div class="cart-footer-row">
+          <a href="/shop/" class="btn btn-outline-dark btn-sm">← Continue Shopping</a>
+          <button type="submit" class="btn btn-accent btn-sm">↺ Update Cart &amp; Options</button>
+        </div>
+      </div>
+    </form>
+
+    <div class="info-box">
+      <h3>ℹ️ How ordering works</h3>
+      <p>Your cart is a <strong>quote basket</strong>. Every garment is <strong>custom branded to your club or company</strong> — orders are handled personally by our team.</p>
+      <p>Once ready, click <strong>"Request a Quote"</strong> or <strong>"Order via WhatsApp"</strong> and we will:</p>
+      <ol>
+        <li><strong>Confirm</strong> your sizes, quantities and colour choices</li>
+        <li><strong>Collect</strong> your logo / artwork (AI, EPS or hi-res PDF)</li>
+        <li><strong>Send a digital proof</strong> for approval before production</li>
+        <li><strong>Issue a formal invoice</strong> — pay via EFT or card</li>
+        <li><strong>Produce and deliver</strong> your branded order nationwide</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ── SUMMARY ── -->
+  <div class="order-summary">
+    <div class="summary-head"><h3>Order Summary</h3><p>Prices exclude VAT · Custom branded to order</p></div>
+    <div class="summary-body">
+      {% for item in items %}
+      <div class="sum-line">
+        <span class="lbl">
+          {{ item.product.name|truncatechars:22 }} ×{{ item.qty }}
+          {% if item.size %}<br/><small style="color:var(--accent)">{{ item.size }}{% if item.colour %} / {{ item.colour }}{% endif %}</small>{% endif %}
+        </span>
+        <span class="val">R{{ item.subtotal|floatformat:2 }}</span>
+      </div>
+      {% endfor %}
+      <hr class="sum-divider"/>
+      <div class="sum-line"><span class="lbl">Subtotal (excl. VAT)</span><span class="val">R{{ total|floatformat:2 }}</span></div>
+      <div class="sum-line"><span class="lbl">VAT @ 15%</span><span class="val">R{% widthratio total 100 15 %}.00</span></div>
+      <hr class="sum-divider"/>
+      <div class="sum-total"><span class="lbl">Estimated Total</span><span class="val">R{{ total|floatformat:2 }}</span></div>
+      <p class="sum-note">Delivery confirmed on your quote based on location and order size.</p>
+
+      <div class="sum-actions">
+        <a href="{% url 'quote_request' %}" class="btn-quote">⚡ Request a Quote</a>
+        <a href="https://wa.me/{{ site.whatsapp_number }}?text={{ wa_message }}" class="btn-whatsapp" target="_blank" rel="noopener">💬 Order via WhatsApp</a>
+        <a href="/shop/" class="btn-keep">← Keep Shopping</a>
+      </div>
+
+      <div class="next-steps">
+        <h4>What happens next</h4>
+        <div class="ns-item"><div class="ns-num">1</div><div class="ns-text"><strong>Submit your cart</strong> via quote or WhatsApp</div></div>
+        <div class="ns-item"><div class="ns-num">2</div><div class="ns-text"><strong>We confirm</strong> sizes, colours &amp; your branding</div></div>
+        <div class="ns-item"><div class="ns-num">3</div><div class="ns-text"><strong>Approve your proof</strong>, then pay by EFT or card</div></div>
+        <div class="ns-item"><div class="ns-num">4</div><div class="ns-text"><strong>We deliver</strong> your branded teamwear to your door</div></div>
+      </div>
+    </div>
+  </div>
+
+{% else %}
+  <div class="empty-cart">
+    <span class="empty-icon">🛒</span>
+    <h2>Your Cart is Empty</h2>
+    <p>Browse our teamwear range and add products to get started.</p>
+    <a href="/shop/" class="btn btn-primary btn-lg">Shop Teamwear →</a>
+  </div>
+{% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+var updateTimer = null;
+function adjustQty(id, d) {
+  var f = document.getElementById(id);
+  if (!f) return;
+  f.value = Math.max(0, parseInt(f.value || 0) + d);
+  scheduleUpdate();
+}
+function scheduleUpdate() {
+  clearTimeout(updateTimer);
+  updateTimer = setTimeout(function(){ document.getElementById('cartForm').submit(); }, 700);
+}
+// highlight missing size/colour
+document.querySelectorAll('.cart-inline-select.missing').forEach(function(s){
+  s.addEventListener('change', function(){ this.classList.remove('missing'); });
+});
+</script>
+{% endblock %}

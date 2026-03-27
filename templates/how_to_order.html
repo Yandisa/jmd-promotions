@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}How to Order – {{ site.site_name }}{% endblock %}
+{% block content %}
+<div class="page-header"><div class="page-header-inner"><div class="page-eyebrow">Easy Process</div><h1>How to Order</h1><p>Getting your team's custom kit is simple. Here's how it works from start to finish.</p><div class="breadcrumb"><a href="/">Home</a><span class="bc-sep">/</span><span>How to Order</span></div></div></div>
+<div style="max-width:1000px;margin:0 auto;padding:64px 48px">
+  {% for step in steps %}
+  <div style="display:grid;grid-template-columns:80px 1fr;gap:32px;margin-bottom:52px;align-items:start">
+    <div style="width:72px;height:72px;border-radius:50%;background:{{ site.secondary_color }};border:3px solid {{ site.accent_color }};display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.9rem;color:{{ site.accent_color }};box-shadow:0 0 0 6px rgba(240,165,0,.1);flex-shrink:0">{{ step.number }}</div>
+    <div style="padding-top:12px">
+      <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.9rem;color:{{ site.secondary_color }};letter-spacing:.04em;line-height:1;margin-bottom:10px">{{ step.icon }} {{ step.title }}</h3>
+      <p style="font-size:1rem;font-weight:300;color:var(--dark-grey);line-height:1.8">{{ step.description }}</p>
+    </div>
+  </div>
+  {% if not forloop.last %}<div style="height:1px;background:rgba(10,22,40,.07);margin-bottom:52px"></div>{% endif %}
+  {% empty %}
+  <p style="color:var(--grey);text-align:center">No steps yet — add them in admin.</p>
+  {% endfor %}
+  <div style="margin-top:48px;background:linear-gradient(135deg,{{ site.primary_color }},#8b0000);border-radius:8px;padding:40px;text-align:center;color:#fff">
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:.04em;margin-bottom:10px">Ready to Get Started?</h2>
+    <p style="color:rgba(255,255,255,.75);font-size:.95rem;font-weight:300;margin-bottom:24px">Submit a quote request and we'll guide you through the rest.</p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <a href="{% url 'quote_request' %}" style="background:#fff;color:{{ site.primary_color }};font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:14px 30px;border-radius:4px;transition:all .2s;display:inline-flex;align-items:center;gap:8px">⚡ Get a Quote</a>
+      <a href="https://wa.me/{{ site.whatsapp_number }}" style="background:rgba(255,255,255,.14);color:#fff;font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:14px 30px;border-radius:4px;border:2px solid rgba(255,255,255,.38);display:inline-flex;align-items:center;gap:8px" target="_blank">💬 WhatsApp Us</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

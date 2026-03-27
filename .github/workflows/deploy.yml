@@ -1,0 +1,26 @@
+# ── GitHub Actions — Deploy to Coolify on push to main ───────────────────────
+name: Deploy to Coolify
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Trigger Coolify Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Coolify can auto-deploy on git push via webhook — this job
+      # triggers the Coolify webhook so the deploy starts immediately.
+      - name: Trigger Coolify Webhook
+        run: |
+          curl --silent --show-error --fail \
+            -X GET \
+            "${{ secrets.COOLIFY_WEBHOOK_URL }}"
+        # COOLIFY_WEBHOOK_URL — get this from:
+        # Coolify → your app → Settings → Webhooks → Deploy Webhook URL
+        # Add it as a GitHub secret: Settings → Secrets → Actions → New secret

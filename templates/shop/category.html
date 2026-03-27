@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}{{ category.name }} – {{ site.site_name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-eyebrow">{{ category.eyebrow|default:"Shop" }}</div>
+    <h1>{{ category.icon }} {{ category.name }}</h1>
+    {% if category.description %}<p>{{ category.description }}</p>{% endif %}
+    <div class="breadcrumb"><a href="/">Home</a><span class="bc-sep">/</span><a href="/shop/">Shop</a><span class="bc-sep">/</span><span>{{ category.name }}</span></div>
+  </div>
+</div>
+<div style="padding:40px 48px 64px;max-width:1280px;margin:0 auto">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px">
+    <p style="font-size:.85rem;color:var(--grey)">Showing <strong>{{ products.count }}</strong> product{{ products.count|pluralize }}</p>
+    <form method="get"><select name="sort" class="form-control" style="width:auto;display:inline-block;padding:9px 32px 9px 14px" onchange="this.form.submit()">
+      <option value="" {% if not sort %}selected{% endif %}>Sort: Featured</option>
+      <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest First</option>
+      <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Price: Low → High</option>
+      <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Price: High → Low</option>
+    </select></form>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:22px">
+    {% for product in products %}
+    <div class="product-card">
+      <a href="{{ product.get_absolute_url }}">
+        <div class="product-card-img" style="background:{{ product.category.bg_color }}">
+          {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}"/>{% else %}<span style="font-size:5rem;opacity:.2">{{ product.category.icon }}</span>{% endif %}
+          {% if product.badge %}<span class="product-badge badge-{{ product.badge }}">{% if product.badge == 'new' %}New In{% elif product.badge == 'sale' %}Sale{% elif product.badge == 'combo' %}Combo{% elif product.badge == 'hot' %}🔥 Hot{% endif %}</span>{% endif %}
+        </div>
+      </a>
+      <div class="product-card-body">
+        <div class="product-cat-label">{{ product.category.name }}</div>
+        <div class="product-name"><a href="{{ product.get_absolute_url }}" style="color:inherit">{{ product.name }}</a></div>
+        <div class="product-foot">
+          <div class="product-price">{% if product.sale_price %}<span class="old-price">R{{ product.price }}</span>R{{ product.sale_price }}<span class="excl">excl. VAT</span>{% else %}R{{ product.price }}<span class="excl">excl. VAT</span>{% endif %}</div>
+          <a href="{{ product.get_absolute_url }}" class="product-add-btn" title="Select size &amp; add to cart" style="display:flex;align-items:center;justify-content:center;text-decoration:none">+</a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--grey)"><p>No products in this category yet.</p></div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

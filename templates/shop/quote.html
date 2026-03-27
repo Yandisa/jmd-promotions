@@ -1,0 +1,301 @@
+{% extends 'base.html' %}
+{% block title %}Get a Quote – {{ site.site_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.quote-layout { max-width: 1100px; margin: 0 auto; padding: 52px 48px; display: grid; grid-template-columns: 1fr 360px; gap: 40px; align-items: start; }
+
+/* form side */
+.quote-form-wrap { background: #fff; border-radius: 8px; box-shadow: 0 2px 20px rgba(10,22,40,.08); overflow: hidden; }
+.quote-form-head { background: linear-gradient(135deg, var(--secondary), #0e2f5a); padding: 28px 36px; }
+.quote-form-head h2 { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: #fff; letter-spacing: .04em; margin-bottom: 4px; }
+.quote-form-head p { font-size: .8rem; color: rgba(245,245,240,.5); }
+.quote-form-body { padding: 36px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.form-row.single { grid-template-columns: 1fr; }
+.form-section-title { font-family: 'Barlow Condensed', sans-serif; font-size: .78rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); margin: 28px 0 16px; padding-bottom: 8px; border-bottom: 1px solid rgba(240,165,0,.2); }
+.form-section-title:first-child { margin-top: 0; }
+
+/* cart summary side */
+.cart-summary-panel { position: sticky; top: 110px; display: flex; flex-direction: column; gap: 16px; }
+.panel-box { background: #fff; border-radius: 8px; box-shadow: 0 2px 16px rgba(10,22,40,.08); overflow: hidden; }
+.panel-head { padding: 16px 22px; font-family: 'Barlow Condensed', sans-serif; font-size: .8rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; border-bottom: 1px solid rgba(10,22,40,.08); display: flex; align-items: center; justify-content: space-between; }
+.panel-head .badge { background: var(--primary); color: #fff; font-size: .62rem; padding: 2px 8px; border-radius: 10px; }
+.panel-body { padding: 16px 22px; }
+.cart-preview-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(10,22,40,.06); }
+.cart-preview-item:last-child { border-bottom: none; }
+.cpi-thumb { width: 44px; height: 44px; border-radius: 4px; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+.cpi-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.cpi-info { flex: 1; min-width: 0; }
+.cpi-name { font-family: 'Barlow Condensed', sans-serif; font-size: .88rem; font-weight: 700; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cpi-meta { font-size: .7rem; color: var(--grey); margin-top: 2px; }
+.cpi-price { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; color: var(--navy); flex-shrink: 0; }
+.cart-preview-total { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 0 0; font-size: .88rem; }
+.cart-preview-total .lbl { color: var(--grey); }
+.cart-preview-total .val { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--primary); }
+.no-cart-note { font-size: .84rem; color: var(--grey); line-height: 1.7; padding: 6px 0; }
+.no-cart-note a { color: var(--primary); }
+
+/* info steps */
+.steps-panel { background: linear-gradient(135deg, var(--secondary), #0e2f5a); border-radius: 8px; padding: 24px; }
+.steps-panel h4 { font-family: 'Barlow Condensed', sans-serif; font-size: .78rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+.sp-step { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
+.sp-num { width: 22px; height: 22px; border-radius: 50%; background: rgba(240,165,0,.2); border: 1px solid var(--accent); color: var(--accent); font-family: 'Bebas Neue', sans-serif; font-size: .8rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.sp-text { font-size: .8rem; color: rgba(245,245,240,.6); line-height: 1.6; }
+.sp-text strong { color: rgba(245,245,240,.88); font-weight: 600; }
+
+/* submit area */
+.submit-area { margin-top: 28px; display: flex; flex-direction: column; gap: 12px; }
+.submit-btn { background: linear-gradient(135deg, var(--primary), #e05050); color: #fff; border: none; padding: 16px; border-radius: 6px; font-family: 'Barlow', sans-serif; font-size: .84rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all .2s; box-shadow: 0 4px 14px rgba(214,40,40,.28); }
+.submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(214,40,40,.4); }
+.submit-note { font-size: .75rem; color: var(--grey); text-align: center; line-height: 1.55; }
+
+@media (max-width: 900px) {
+  .quote-layout { grid-template-columns: 1fr; padding: 28px 20px; }
+  .cart-summary-panel { position: static; }
+  .form-row { grid-template-columns: 1fr; }
+  .quote-form-body { padding: 24px; }
+  .quote-form-head { padding: 22px 24px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-eyebrow">JMD Promotions</div>
+    <h1>Get a Custom Quote</h1>
+    <p>Tell us what you need and we'll get back to you within 48 hours.</p>
+    <div class="breadcrumb">
+      <a href="/">Home</a><span class="bc-sep">/</span>
+      <a href="/shop/">Shop</a><span class="bc-sep">/</span>
+      <span>Get a Quote</span>
+    </div>
+  </div>
+</div>
+
+<div class="quote-layout">
+
+  <!-- ── LEFT: FORM ── -->
+  <div class="quote-form-wrap">
+    <div class="quote-form-head">
+      <h2>Quote Request Form</h2>
+      <p>Fill in your details below — we'll contact you to confirm everything before any payment is taken.</p>
+    </div>
+    <div class="quote-form-body">
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="form-section-title">👤 Your Details</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Your Name *</label>
+            <input type="text" name="name" class="form-control" required placeholder="John Smith"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address *</label>
+            <input type="email" name="email" class="form-control" required placeholder="john@yourclub.co.za"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone / WhatsApp *</label>
+            <input type="tel" name="phone" class="form-control" required placeholder="+27 82 000 0000"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Club / School / Company Name</label>
+            <input type="text" name="club_name" class="form-control" placeholder="FC Example"/>
+          </div>
+        </div>
+
+        <div class="form-section-title">🛒 Order Details</div>
+
+        {% if cart_items %}
+        <!-- Cart items are pre-loaded — show a read-only summary and hidden notes -->
+        <div style="background:rgba(240,165,0,.07);border:1px solid rgba(240,165,0,.25);border-radius:6px;padding:16px 20px;margin-bottom:20px">
+          <p style="font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px">✅ Items from your cart (auto-filled)</p>
+          {% for item in cart_items %}
+          <div style="display:flex;justify-content:space-between;font-size:.86rem;color:var(--dark-grey);padding:5px 0;border-bottom:1px solid rgba(240,165,0,.12)">
+            <span><strong>{{ item.product.name }}</strong> × {{ item.qty }}{% if item.size %} — Size: {{ item.size }}{% endif %}{% if item.colour %} — Colour: {{ item.colour }}{% endif %}</span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--navy)">R{{ item.subtotal|floatformat:2 }}</span>
+          </div>
+          {% endfor %}
+          {% if cart_total %}
+          <div style="display:flex;justify-content:space-between;padding-top:10px;font-size:.88rem">
+            <span style="color:var(--grey)">Estimated total (excl. VAT)</span>
+            <strong>{{ cart_total }}</strong>
+          </div>
+          {% endif %}
+        </div>
+        <!-- Hidden: pass cart summary into notes -->
+        <input type="hidden" name="notes" value="Cart items:&#10;{{ cart_notes_prefill }}&#10;&#10;Estimated total: {{ cart_total }}"/>
+        {% else %}
+        <!-- No cart — show manual product selector -->
+        <div class="form-group">
+          <label class="form-label">Product / Item of Interest</label>
+          <select name="product_id" class="form-control">
+            <option value="">— Browse our range / Not sure yet —</option>
+            {% regroup all_products by category as product_groups %}
+            {% for group in product_groups %}
+            <optgroup label="{{ group.grouper }}">
+              {% for p in group.list %}
+              <option value="{{ p.id }}" {% if linked_product and linked_product.id == p.id %}selected{% endif %}>{{ p.name }} — R{{ p.price }}</option>
+              {% endfor %}
+            </optgroup>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Additional Notes</label>
+          <textarea name="notes" class="form-control" placeholder="Any other details about your order…"></textarea>
+        </div>
+        {% endif %}
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Total Quantity *</label>
+            <input type="number" name="quantity" class="form-control" min="1"
+                   value="{% if cart_items %}{% for item in cart_items %}{{ item.qty }}{% if not forloop.last %}+{% endif %}{% endfor %}{% else %}1{% endif %}"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Preferred Colours</label>
+            <input type="text" name="colours" class="form-control"
+                   value="{{ cart_colours_prefill }}"
+                   placeholder="e.g. Red &amp; White, or as per club colours"/>
+          </div>
+        </div>
+
+        <div class="form-section-title">📐 Sizing & Branding</div>
+        <div class="form-row single">
+          <div class="form-group">
+            <label class="form-label">Size Breakdown</label>
+            <input type="text" name="sizes_breakdown" class="form-control"
+                   value="{{ cart_sizes_prefill }}"
+                   placeholder="e.g. 5×XS, 10×S, 8×M, 6×L, 4×XL, 2×XXL"/>
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group">
+            <label class="form-label">Branding / Printing Details</label>
+            <textarea name="branding_details" class="form-control"
+                      placeholder="Logo placement (chest / back / sleeve), embroidery or print, player names and numbers on back, sponsor logos…"></textarea>
+          </div>
+        </div>
+
+        <div class="submit-area">
+          <button type="submit" class="submit-btn">
+            ⚡ Submit Quote Request
+          </button>
+          <p class="submit-note">
+            We'll respond within 48 hours with a formal quote.
+            No payment is taken until you approve a proof.
+            {% if cart_items %}Your cart will be cleared after submission.{% endif %}
+          </p>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ── RIGHT: CART SUMMARY + STEPS ── -->
+  <div class="cart-summary-panel">
+
+    <!-- Cart preview -->
+    <div class="panel-box">
+      <div class="panel-head">
+        🛒 Your Cart
+        {% if cart_items %}<span class="badge">{{ cart_items|length }} item{{ cart_items|length|pluralize }}</span>{% endif %}
+      </div>
+      <div class="panel-body">
+        {% if cart_items %}
+          {% for item in cart_items %}
+          <div class="cart-preview-item">
+            <div class="cpi-thumb" style="background:{{ item.product.category.bg_color }}">
+              {% if item.product.image %}
+                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}"/>
+              {% else %}
+                {{ item.product.category.icon }}
+              {% endif %}
+            </div>
+            <div class="cpi-info">
+              <div class="cpi-name">{{ item.product.name }}</div>
+              <div class="cpi-meta">
+                qty: {{ item.qty }}
+                {% if item.size %} · {{ item.size }}{% endif %}
+                {% if item.colour %} · {{ item.colour }}{% endif %}
+              </div>
+            </div>
+            <div class="cpi-price">R{{ item.subtotal|floatformat:2 }}</div>
+          </div>
+          {% endfor %}
+          <div class="cart-preview-total">
+            <span class="lbl">Estimated total</span>
+            <span class="val">{{ cart_total }}</span>
+          </div>
+        {% else %}
+          <p class="no-cart-note">
+            Your cart is empty. You can still submit a general inquiry,
+            or <a href="/shop/">browse our range</a> and add items first.
+          </p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- What happens next -->
+    <div class="steps-panel">
+      <h4>What happens after you submit</h4>
+      <div class="sp-step">
+        <div class="sp-num">1</div>
+        <div class="sp-text"><strong>We receive your request</strong> and review your items within 48 hours</div>
+      </div>
+      <div class="sp-step">
+        <div class="sp-num">2</div>
+        <div class="sp-text"><strong>We contact you</strong> to confirm final sizes, colours and branding details</div>
+      </div>
+      <div class="sp-step">
+        <div class="sp-num">3</div>
+        <div class="sp-text"><strong>Send us your logo</strong> — AI, EPS or high-res PDF — and we create a digital proof</div>
+      </div>
+      <div class="sp-step">
+        <div class="sp-num">4</div>
+        <div class="sp-text"><strong>You approve the proof</strong> — only then do we issue an invoice</div>
+      </div>
+      <div class="sp-step">
+        <div class="sp-num">5</div>
+        <div class="sp-text"><strong>Pay and relax</strong> — we produce and deliver your branded teamwear to your door</div>
+      </div>
+    </div>
+
+    <!-- WhatsApp alternative -->
+    <div style="background:#fff;border-radius:8px;padding:22px;box-shadow:0 2px 16px rgba(10,22,40,.07);text-align:center">
+      <p style="font-size:.82rem;color:var(--grey);margin-bottom:14px;line-height:1.6">Prefer to chat directly? Send us your cart via WhatsApp.</p>
+      <a href="https://wa.me/{{ site.whatsapp_number }}{% if cart_items %}?text={{ wa_message }}{% endif %}"
+         class="btn btn-accent"
+         style="width:100%;justify-content:center;display:flex"
+         target="_blank"
+         rel="noopener">
+        💬 WhatsApp Us Instead
+      </a>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Build WA message from cart for the WhatsApp button in this template
+{% if cart_items %}
+(function(){
+  var items = [
+    {% for item in cart_items %}
+    "{{ item.qty }}× {{ item.product.name }}{% if item.size %} ({{ item.size }}){% endif %}{% if item.colour %} [{{ item.colour }}]{% endif %} — R{{ item.subtotal|floatformat:2 }}"{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+  var msg = "Hi JMD Promotions, I'd like to request a quote:\n\n" + items.join("\n") + "\n\nTotal: {{ cart_total }} (excl. VAT)\n\nPlease contact me to confirm details.";
+  var links = document.querySelectorAll('a[href*="WhatsApp"]');
+  // already set server-side via wa_message but this is a fallback
+})();
+{% endif %}
+</script>
+{% endblock %}

@@ -1,0 +1,423 @@
+{% extends 'base.html' %}
+{% block title %}{{ site.meta_title }}{% endblock %}
+{% block extra_css %}
+<style>
+/* ── HERO CAROUSEL ── */
+.hero-slider{position:relative;height:580px;overflow:hidden;background:{{ site.secondary_color }}}
+.hero-slide{position:absolute;inset:0;display:flex;align-items:center;opacity:0;transition:opacity .8s ease,transform .8s ease;transform:scale(1.03);pointer-events:none;z-index:0}
+.hero-slide.active{opacity:1;transform:scale(1);pointer-events:all;z-index:1}
+.hero-slide.exiting{opacity:0;transform:scale(.97);z-index:0}
+.slide-bg{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform 8s ease}
+.hero-slide.active .slide-bg{transform:scale(1.05)}
+.slide-overlay{position:absolute;inset:0;background:linear-gradient(105deg,rgba(10,22,40,.88) 0%,rgba(10,22,40,.55) 50%,rgba(10,22,40,.2) 100%)}
+.slide-pattern{position:absolute;inset:0;background-image:repeating-linear-gradient(60deg,rgba(214,40,40,.04) 0,rgba(214,40,40,.04) 1px,transparent 1px,transparent 50px),repeating-linear-gradient(-60deg,rgba(214,40,40,.04) 0,rgba(214,40,40,.04) 1px,transparent 1px,transparent 50px)}
+.slide-glow{position:absolute;right:-100px;top:-100px;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle at 40% 40%,rgba(214,40,40,.14),transparent 62%);pointer-events:none}
+.slide-content{position:relative;z-index:2;padding:0 64px;max-width:700px}
+.slide-eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:.67rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#ffc233;margin-bottom:22px;opacity:0;transform:translateY(16px);transition:all .6s ease .2s}
+.hero-slide.active .slide-eyebrow{opacity:1;transform:translateY(0)}
+.slide-eyebrow::before{content:'';display:block;width:38px;height:2px;background:{{ site.accent_color }}}
+.slide-heading{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.2rem,6.5vw,5.8rem);line-height:.92;color:var(--white);letter-spacing:.02em;margin-bottom:20px;opacity:0;transform:translateY(24px);transition:all .6s ease .35s}
+.hero-slide.active .slide-heading{opacity:1;transform:translateY(0)}
+.slide-sub{color:rgba(245,245,240,.65);font-size:1.02rem;font-weight:300;line-height:1.75;margin-bottom:36px;max-width:500px;opacity:0;transform:translateY(20px);transition:all .6s ease .5s}
+.hero-slide.active .slide-sub{opacity:1;transform:translateY(0)}
+.slide-btns{display:flex;gap:14px;flex-wrap:wrap;align-items:center;opacity:0;transform:translateY(16px);transition:all .6s ease .65s}
+.hero-slide.active .slide-btns{opacity:1;transform:translateY(0)}
+/* arrows */
+.slider-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:10;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.25);color:#fff;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;cursor:pointer;transition:all .2s;backdrop-filter:blur(4px)}
+.slider-arrow:hover{background:{{ site.accent_color }};border-color:{{ site.accent_color }};color:{{ site.secondary_color }};transform:translateY(-50%) scale(1.08)}
+.slider-arrow.prev{left:28px}
+.slider-arrow.next{right:28px}
+/* dots */
+.slider-dots{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:10}
+.slider-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.35);cursor:pointer;transition:all .3s;border:none;padding:0}
+.slider-dot.active{background:{{ site.accent_color }};width:28px;border-radius:4px}
+/* progress bar */
+.slider-progress{position:absolute;bottom:0;left:0;height:4px;background:linear-gradient(90deg,{{ site.primary_color }},{{ site.accent_color }});z-index:10;transition:width linear}
+/* slide counter */
+.slider-counter{position:absolute;top:28px;right:28px;z-index:10;font-family:'Bebas Neue',sans-serif;font-size:1rem;color:rgba(255,255,255,.4);letter-spacing:.08em}
+.slider-counter span{color:{{ site.accent_color }}}
+/* fallback static hero (when no slides) */
+.hero-static{position:relative;min-height:560px;background:{{ site.secondary_color }};display:flex;align-items:center;overflow:hidden}
+.hero-static-pattern{position:absolute;inset:0;background-image:repeating-linear-gradient(60deg,rgba(214,40,40,.05) 0,rgba(214,40,40,.05) 1px,transparent 1px,transparent 50px),repeating-linear-gradient(-60deg,rgba(214,40,40,.05) 0,rgba(214,40,40,.05) 1px,transparent 1px,transparent 50px)}
+.hero-static-glow{position:absolute;right:-120px;top:-120px;width:750px;height:750px;border-radius:50%;background:radial-gradient(circle at 40%,rgba(214,40,40,.16),transparent 62%);pointer-events:none}
+.hero-static-content{position:relative;z-index:2;padding:80px 60px;max-width:680px;animation:heroIn .8s ease both}
+@keyframes heroIn{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:translateX(0)}}
+.hero-static-eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:.67rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#ffc233;margin-bottom:22px}
+.hero-static-eyebrow::before{content:'';display:block;width:38px;height:2px;background:{{ site.accent_color }}}
+.hero-static h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.4rem,7vw,6rem);line-height:.92;color:var(--white);letter-spacing:.02em;margin-bottom:22px}
+.hero-static-sub{color:rgba(245,245,240,.62);font-size:1.05rem;font-weight:300;line-height:1.75;margin-bottom:38px;max-width:500px}
+.hero-static-btns{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.hero-stripe{position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,{{ site.primary_color }},{{ site.accent_color }},{{ site.primary_color }})}
+@media(max-width:768px){.hero-slider{height:460px}.slide-content{padding:0 28px}.slider-arrow{width:40px;height:40px;font-size:1rem}.slider-arrow.prev{left:12px}.slider-arrow.next{right:12px}.slide-heading{font-size:clamp(2.4rem,8vw,3.5rem)}}
+@media(max-width:480px){.hero-slider{height:420px}.slide-content{padding:0 20px}}
+
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:290px 290px;gap:10px;padding:0 48px 68px;max-width:1280px;margin:0 auto}
+.cat-card{position:relative;overflow:hidden;display:block;border-radius:6px;box-shadow:0 4px 20px rgba(10,22,40,.15)}
+.cat-card.wide{grid-column:span 2}
+.cat-card-bg{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .55s ease}
+.cat-card:hover .cat-card-bg{transform:scale(1.06)}
+.cat-icon-bg{position:absolute;right:22px;bottom:22px;font-size:7rem;opacity:.1;transition:transform .55s ease,opacity .3s;pointer-events:none;user-select:none}
+.cat-card:hover .cat-icon-bg{transform:scale(1.12) rotate(-6deg);opacity:.18}
+.cat-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,22,40,.92) 0%,rgba(10,22,40,.18) 55%,transparent 100%);transition:background .3s}
+.cat-card:hover .cat-overlay{background:linear-gradient(to top,rgba(10,22,40,.96) 0%,rgba(214,40,40,.1) 100%)}
+.cat-info{position:absolute;bottom:0;left:0;right:0;padding:28px 30px}
+.cat-eyebrow-lbl{font-size:.58rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#ffc233;margin-bottom:6px;display:block}
+.cat-title{font-family:'Bebas Neue',sans-serif;font-size:2.1rem;color:var(--white);letter-spacing:.04em;line-height:1;margin-bottom:12px}
+.cat-cta-link{display:inline-flex;align-items:center;gap:8px;font-size:.68rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:{{ site.accent_color }};border-bottom:1px solid rgba(240,165,0,.4);padding-bottom:2px;transition:gap .2s,color .2s}
+.cat-card:hover .cat-cta-link{gap:14px;color:#ffc233}
+.cat-pcount{font-size:.6rem;color:rgba(245,245,240,.38);margin-top:5px}
+
+.products-section{background:var(--offwhite);padding:68px 48px}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px;max-width:1280px;margin:0 auto}
+
+.how-section{padding:72px 60px;max-width:1180px;margin:0 auto}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);position:relative;margin-top:52px;gap:0}
+.steps-grid::before{content:'';position:absolute;top:27px;left:12.5%;right:12.5%;height:2px;background:linear-gradient(90deg,{{ site.primary_color }},{{ site.accent_color }},{{ site.primary_color }})}
+.step-item{text-align:center;padding:0 22px;position:relative;z-index:1}
+.step-num{width:56px;height:56px;border-radius:50%;background:{{ site.secondary_color }};border:2px solid {{ site.accent_color }};display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.55rem;color:{{ site.accent_color }};margin:0 auto 20px;box-shadow:0 0 0 5px rgba(240,165,0,.1),0 4px 16px rgba(10,22,40,.2)}
+.step-title{font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--navy);margin-bottom:10px}
+.step-desc{font-size:.84rem;font-weight:300;color:var(--grey);line-height:1.7}
+
+.cta-band{background:linear-gradient(135deg,{{ site.primary_color }} 0%,#8b0000 100%);display:flex;align-items:center;justify-content:space-between;padding:56px 80px;gap:40px;position:relative;overflow:hidden}
+.cta-band::before{content:'';position:absolute;left:-80px;top:-80px;width:350px;height:350px;border-radius:50%;background:rgba(255,255,255,.06)}
+.cta-band::after{content:'';position:absolute;right:-40px;bottom:-60px;width:250px;height:250px;border-radius:50%;background:rgba(240,165,0,.1)}
+.cta-txt{position:relative;z-index:1}
+.cta-txt h2{font-family:'Bebas Neue',sans-serif;font-size:2.9rem;color:#fff;letter-spacing:.04em;line-height:1.02;margin-bottom:8px}
+.cta-txt h2 span{color:#ffc233}
+.cta-txt p{color:rgba(255,255,255,.72);font-size:.95rem;font-weight:300}
+.cta-btns-row{display:flex;gap:14px;flex-shrink:0;position:relative;z-index:1;flex-wrap:wrap}
+.btn-white{background:#fff;color:{{ site.primary_color }};font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:14px 30px;border-radius:4px;border:none;transition:all .2s;box-shadow:0 3px 12px rgba(0,0,0,.15);display:inline-flex;align-items:center;gap:8px}
+.btn-white:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.btn-wa{background:rgba(255,255,255,.14);color:#fff;font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:14px 30px;border-radius:4px;border:2px solid rgba(255,255,255,.38);display:inline-flex;align-items:center;gap:8px;transition:all .2s}
+.btn-wa:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.7)}
+
+.testimonials-section{background:var(--offwhite);padding:68px 48px}
+.testimonials-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;max-width:1180px;margin:0 auto}
+.t-card{background:#fff;border-radius:6px;padding:28px;box-shadow:0 2px 16px rgba(10,22,40,.07);border-top:3px solid {{ site.accent_color }};position:relative}
+.t-stars{color:{{ site.accent_color }};font-size:1rem;margin-bottom:14px;letter-spacing:2px}
+.t-text{font-size:.92rem;color:var(--dark-grey);line-height:1.75;font-style:italic;margin-bottom:18px;position:relative;padding-top:10px}
+.t-text::before{content:'"';font-family:'Bebas Neue',sans-serif;font-size:3.5rem;color:{{ site.accent_color }};opacity:.15;position:absolute;top:-8px;left:-6px;line-height:1}
+.t-author{display:flex;align-items:center;gap:12px}
+.t-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;background:{{ site.secondary_color }};display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;flex-shrink:0;overflow:hidden}
+.t-name{font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:700;color:var(--navy)}
+.t-club{font-size:.75rem;color:var(--grey)}
+
+.gallery-home{background:{{ site.secondary_color }};padding:68px 48px}
+.gallery-grid-home{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:215px 215px;gap:10px;max-width:1280px;margin:36px auto 0;border-radius:6px;overflow:hidden}
+.g-item{position:relative;overflow:hidden;cursor:pointer}
+.g-item img{width:100%;height:100%;object-fit:cover;transition:transform .45s ease;display:block}
+.g-item:hover img{transform:scale(1.07)}
+.g-placeholder{width:100%;height:100%;background:linear-gradient(145deg,#0d2b4a,#1a4a78);display:flex;align-items:center;justify-content:center;font-size:3rem;opacity:.5}
+.g-item:nth-child(1){grid-column:1/3}
+.g-item:nth-child(5){grid-column:3/5}
+.g-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,22,40,.8),transparent);opacity:0;transition:opacity .3s;display:flex;align-items:flex-end;padding:16px}
+.g-item:hover .g-overlay{opacity:1}
+.g-label{font-size:.65rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#ffc233}
+.gallery-home .sec-head{padding-top:0}
+.gallery-home .sec-head h2{color:var(--white)}
+.gallery-home .sec-head p{color:rgba(245,245,240,.5)}
+
+.cat-band{background:{{ site.secondary_color }};padding:44px 48px;display:flex;align-items:center;gap:40px;justify-content:center;border-top:1px solid rgba(240,165,0,.15)}
+.cat-band-img{max-height:110px;border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.cat-band-txt h3{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--white);letter-spacing:.04em;margin-bottom:8px}
+.cat-band-txt p{color:rgba(245,245,240,.6);font-size:.9rem;font-weight:300;margin-bottom:18px}
+
+@media(max-width:1060px){.hero-content{padding:56px 28px}.cat-grid{grid-template-columns:1fr 1fr;padding:0 20px 48px}.cat-card.wide{grid-column:span 2}.steps-grid{grid-template-columns:repeat(2,1fr);gap:36px}.steps-grid::before{display:none}.cta-band{flex-direction:column;padding:44px 28px;text-align:center}.gallery-grid-home{grid-template-columns:repeat(2,1fr)}.g-item:nth-child(1),.g-item:nth-child(5){grid-column:span 1}.products-section,.testimonials-section,.gallery-home{padding:48px 24px}.how-section{padding:48px 24px}.cat-band{flex-direction:column;text-align:center;padding:36px 24px}}
+@media(max-width:580px){.cat-grid{grid-template-columns:1fr}.cat-card.wide{grid-column:span 1}.hero{min-height:440px}.hero-content{padding:48px 24px}.hero h1{font-size:3rem}}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- HERO CAROUSEL — always shown; slide 1 = Site Settings, slides 2+ = Hero Slides from admin -->
+<div class="hero-slider" id="heroSlider">
+
+  {% for slide in slides %}
+  <div class="hero-slide {% if forloop.first %}active{% endif %}" data-index="{{ forloop.counter0 }}">
+
+    <!-- Background: dict slides use slide.image directly, model slides use slide.image.url -->
+    {% if slide.is_static %}
+      {% if slide.image %}
+        <div class="slide-bg" style="background-image:url('{{ slide.image.url }}')"></div>
+      {% else %}
+        <div class="slide-bg" style="background:linear-gradient(135deg,{{ slide.bg_color }},#0e2f5a)"></div>
+      {% endif %}
+    {% else %}
+      {% if slide.image %}
+        <div class="slide-bg" style="background-image:url('{{ slide.image.url }}')"></div>
+      {% else %}
+        <div class="slide-bg" style="background:linear-gradient(135deg,{{ slide.bg_color }},#0e2f5a)"></div>
+      {% endif %}
+    {% endif %}
+
+    <div class="slide-overlay"></div>
+    <div class="slide-pattern"></div>
+    <div class="slide-glow"></div>
+
+    <div class="slide-content">
+      <div class="slide-eyebrow">
+        {% if forloop.first %}2026 Collection Is Live{% else %}JMD Promotions{% endif %}
+      </div>
+      <h1 class="slide-heading">{{ slide.heading }}</h1>
+      {% if slide.subheading %}<p class="slide-sub">{{ slide.subheading }}</p>{% endif %}
+      <div class="slide-btns">
+        <a href="{{ slide.cta_url }}" class="btn btn-primary btn-lg">{{ slide.cta_text }} →</a>
+        {% if site.hero_cta2_url and site.hero_cta2_url != '#' %}
+        <a href="{{ site.hero_cta2_url }}" class="btn btn-outline btn-lg" target="_blank">📥 {{ site.hero_cta2_text }}</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+  <!-- Arrows — only when more than 1 slide -->
+  {% if slide_count > 1 %}
+  <button class="slider-arrow prev" onclick="sliderMove(-1)" aria-label="Previous">&#8592;</button>
+  <button class="slider-arrow next" onclick="sliderMove(1)" aria-label="Next">&#8594;</button>
+  <div class="slider-dots">
+    {% for slide in slides %}
+    <button class="slider-dot {% if forloop.first %}active{% endif %}" onclick="sliderGoTo({{ forloop.counter0 }})" aria-label="Slide {{ forloop.counter }}"></button>
+    {% endfor %}
+  </div>
+  <div class="slider-counter"><span id="slideCurrentNum">1</span> / {{ slide_count }}</div>
+  {% endif %}
+
+  <div class="slider-progress" id="sliderProgress" style="width:0%"></div>
+  <div class="hero-stripe"></div>
+</div>
+
+<div class="stats-strip">
+  <div class="stat-item"><div class="stat-num">{{ site.stat1_number }}</div><div class="stat-lbl">{{ site.stat1_label }}</div></div>
+  <div class="stat-item"><div class="stat-num">{{ site.stat2_number }}</div><div class="stat-lbl">{{ site.stat2_label }}</div></div>
+  <div class="stat-item"><div class="stat-num">{{ site.stat3_number }}</div><div class="stat-lbl">{{ site.stat3_label }}</div></div>
+  <div class="stat-item"><div class="stat-num">{{ site.stat4_number }}</div><div class="stat-lbl">{{ site.stat4_label }}</div></div>
+</div>
+
+{% if site.catalogue_pdf %}
+<div class="cat-band">
+  {% if site.catalogue_banner %}<img src="{{ site.catalogue_banner.url }}" class="cat-band-img" alt="Catalogue"/>{% endif %}
+  <div class="cat-band-txt">
+    <h3>📚 2026 Catalogue Now Available</h3>
+    <p>Browse our complete range of teamwear, kits, tracksuits and accessories.</p>
+    <a href="{{ site.catalogue_pdf.url }}" class="btn btn-accent" target="_blank">Download Catalogue →</a>
+  </div>
+</div>
+{% endif %}
+
+<div class="sec-head">
+  <div class="sec-tag">Browse Range</div>
+  <h2>Shop By Category</h2>
+  <p>From full football kits to tracksuits and training gear — everything your team needs, all branded to order.</p>
+</div>
+<div class="cat-grid">
+  {% for cat in home_categories %}
+  <a href="{{ cat.get_absolute_url }}" class="cat-card {% if forloop.first or forloop.counter == 5 %}wide{% endif %}">
+    {% if cat.image %}<div class="cat-card-bg" style="background-image:url('{{ cat.image.url }}');background-color:{{ cat.bg_color }}"></div>
+    {% else %}<div class="cat-card-bg" style="background:linear-gradient(145deg,{{ cat.bg_color }},#0d2240)"></div>{% endif %}
+    <div class="cat-icon-bg">{{ cat.icon }}</div>
+    <div class="cat-overlay"></div>
+    <div class="cat-info">
+      {% if cat.eyebrow %}<span class="cat-eyebrow-lbl">{{ cat.eyebrow }}</span>{% endif %}
+      <div class="cat-title">{{ cat.name }}</div>
+      <div class="cat-cta-link">Shop Now →</div>
+      <div class="cat-pcount">{{ cat.products.count }} products</div>
+    </div>
+  </a>
+  {% empty %}
+  <div style="grid-column:1/-1;text-align:center;padding:60px 24px;color:var(--grey)">
+    <p>No categories yet — <a href="/admin/store/category/add/" style="color:{{ site.primary_color }}">add some in admin →</a></p>
+  </div>
+  {% endfor %}
+</div>
+
+{% if featured %}
+<section class="products-section">
+  <div class="sec-head" style="padding-top:0">
+    <div class="sec-tag">Bestsellers</div><h2>Featured Products</h2>
+    <p>Our most popular teamwear — all available with full custom branding.</p>
+  </div>
+  <div class="products-grid">
+    {% for product in featured %}
+    <div class="product-card">
+      <a href="{{ product.get_absolute_url }}">
+        <div class="product-card-img" style="background:{{ product.category.bg_color }}">
+          {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}"/>
+          {% else %}<span style="font-size:5rem;opacity:.2">{{ product.category.icon }}</span>{% endif %}
+          {% if product.badge %}<span class="product-badge badge-{{ product.badge }}">{% if product.badge == 'new' %}New In{% elif product.badge == 'sale' %}Sale{% elif product.badge == 'combo' %}Combo{% elif product.badge == 'hot' %}🔥 Hot{% endif %}</span>{% endif %}
+        </div>
+      </a>
+      <div class="product-card-body">
+        <div class="product-cat-label">{{ product.category.name }}</div>
+        <div class="product-name"><a href="{{ product.get_absolute_url }}" style="color:inherit">{{ product.name }}</a></div>
+        <div class="product-foot">
+          <div class="product-price">
+            {% if product.sale_price %}<span class="old-price">R{{ product.price }}</span>R{{ product.sale_price }}<span class="excl">excl. VAT</span>
+            {% else %}R{{ product.price }}<span class="excl">excl. VAT</span>{% endif %}
+          </div>
+          <a href="{{ product.get_absolute_url }}" class="product-add-btn" title="Select size &amp; colour" style="display:flex;align-items:center;justify-content:center;text-decoration:none">+</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div style="text-align:center;margin-top:40px"><a href="/shop/" class="btn btn-outline-dark btn-lg">View All Products →</a></div>
+</section>
+{% endif %}
+
+{% if steps %}
+<section>
+  <div class="sec-head"><div class="sec-tag">Easy Process</div><h2>How to Order</h2><p>Getting your team's custom kit is simple — just 4 easy steps.</p></div>
+  <div class="how-section" style="padding-top:0">
+    <div class="steps-grid">
+      {% for step in steps %}
+      <div class="step-item">
+        <div class="step-num">{{ step.number }}</div>
+        <div class="step-title">{{ step.title }}</div>
+        <div class="step-desc">{{ step.description }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<div class="cta-band">
+  <div class="cta-txt"><h2>Need a Custom <span>Team Quote?</span></h2><p>Large order? Mixed sizes? School or club package? We'll sort it out — just get in touch.</p></div>
+  <div class="cta-btns-row">
+    <a href="{% url 'quote_request' %}" class="btn-white">⚡ Get a Quote</a>
+    <a href="https://wa.me/{{ site.whatsapp_number }}" class="btn-wa" target="_blank">💬 WhatsApp Us</a>
+  </div>
+</div>
+
+{% if testimonials %}
+<section class="testimonials-section">
+  <div class="sec-head" style="padding-top:0"><div class="sec-tag">Happy Clients</div><h2>What Teams Say</h2><p>Trusted by clubs, schools and academies across South Africa.</p></div>
+  <div class="testimonials-grid">
+    {% for t in testimonials %}
+    <div class="t-card">
+      <div class="t-stars">{% for i in "12345" %}{% if forloop.counter <= t.rating %}⭐{% endif %}{% endfor %}</div>
+      <p class="t-text">{{ t.text }}</p>
+      <div class="t-author">
+        {% if t.photo %}<img src="{{ t.photo.url }}" class="t-avatar" alt="{{ t.name }}"/>
+        {% else %}<div class="t-avatar">{{ t.name|slice:":1" }}</div>{% endif %}
+        <div><div class="t-name">{{ t.name }}</div>{% if t.club_or_school %}<div class="t-club">{{ t.club_or_school }}</div>{% endif %}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if gallery %}
+<section class="gallery-home">
+  <div class="sec-head"><div class="sec-tag">Our Work</div><h2>Team Gallery</h2><p>A look at clubs and schools we've kitted out across South Africa.</p></div>
+  <div class="gallery-grid-home">
+    {% for img in gallery %}
+    <a href="{% url 'gallery' %}" class="g-item">
+      <img src="{{ img.image.url }}" alt="{{ img.title }}"/>
+      <div class="g-overlay"><span class="g-label">{{ img.title }}</span></div>
+    </a>
+    {% endfor %}
+  </div>
+  <div style="text-align:center;margin-top:32px"><a href="{% url 'gallery' %}" class="btn btn-outline">View Full Gallery →</a></div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function(){
+  var slider = document.getElementById('heroSlider');
+  if(!slider) return;
+
+  var slides = slider.querySelectorAll('.hero-slide');
+  var dots   = slider.querySelectorAll('.slider-dot');
+  var progress = document.getElementById('sliderProgress');
+  var counter  = document.getElementById('slideCurrentNum');
+  var total    = slides.length;
+  var current  = 0;
+  var autoplay, progressAnim, progressStart, INTERVAL = 5000;
+
+  if(total <= 1) return; // no need for carousel logic on single slide
+
+  function goTo(idx){
+    // exit current
+    slides[current].classList.remove('active');
+    slides[current].classList.add('exiting');
+    setTimeout(function(){ slides[current].classList.remove('exiting'); }, 900);
+
+    if(dots[current]) dots[current].classList.remove('active');
+
+    current = (idx + total) % total;
+
+    slides[current].classList.add('active');
+    if(dots[current]) dots[current].classList.add('active');
+    if(counter) counter.textContent = current + 1;
+
+    resetProgress();
+  }
+
+  function resetProgress(){
+    if(progressAnim) cancelAnimationFrame(progressAnim);
+    if(!progress) return;
+    progress.style.transition = 'none';
+    progress.style.width = '0%';
+    progressStart = performance.now();
+
+    function step(now){
+      var elapsed = now - progressStart;
+      var pct = Math.min((elapsed / INTERVAL) * 100, 100);
+      progress.style.width = pct + '%';
+      if(pct < 100) progressAnim = requestAnimationFrame(step);
+    }
+    // slight delay so transition reset takes effect
+    requestAnimationFrame(function(){ progressAnim = requestAnimationFrame(step); });
+  }
+
+  function startAuto(){
+    autoplay = setInterval(function(){ goTo(current + 1); }, INTERVAL);
+  }
+
+  function stopAuto(){
+    clearInterval(autoplay);
+    if(progressAnim) cancelAnimationFrame(progressAnim);
+    if(progress){ progress.style.transition='none'; progress.style.width='0%'; }
+  }
+
+  // expose to inline onclick handlers
+  window.sliderMove = function(dir){
+    stopAuto();
+    goTo(current + dir);
+    startAuto();
+    resetProgress();
+  };
+  window.sliderGoTo = function(idx){
+    stopAuto();
+    goTo(idx);
+    startAuto();
+    resetProgress();
+  };
+
+  // keyboard
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowLeft')  sliderMove(-1);
+    if(e.key === 'ArrowRight') sliderMove(1);
+  });
+
+  // touch / swipe
+  var touchStartX = 0;
+  slider.addEventListener('touchstart', function(e){ touchStartX = e.changedTouches[0].screenX; }, {passive:true});
+  slider.addEventListener('touchend', function(e){
+    var diff = touchStartX - e.changedTouches[0].screenX;
+    if(Math.abs(diff) > 50) sliderMove(diff > 0 ? 1 : -1);
+  }, {passive:true});
+
+  // pause on hover
+  slider.addEventListener('mouseenter', stopAuto);
+  slider.addEventListener('mouseleave', function(){ startAuto(); resetProgress(); });
+
+  // init
+  startAuto();
+  resetProgress();
+})();
+</script>
+{% endblock %}

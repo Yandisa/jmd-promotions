@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} – {{ site.site_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.product-detail{padding:48px;max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px}
+.product-images .main-img{width:100%;height:460px;border-radius:8px;overflow:hidden;position:relative;background:{{ product.category.bg_color }};display:flex;align-items:center;justify-content:center;font-size:8rem}
+.product-images .main-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
+.product-images .main-img:hover img{transform:scale(1.03)}
+.product-thumbs{display:flex;gap:10px;margin-top:12px}
+.product-thumbs img{width:80px;height:80px;object-fit:cover;border-radius:4px;cursor:pointer;border:2px solid transparent;transition:border-color .2s}
+.product-thumbs img:hover,.product-thumbs img.active{border-color:{{ site.primary_color }}}
+
+.product-info h1{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;color:var(--navy);letter-spacing:.03em;line-height:1;margin-bottom:14px}
+.product-cat-tag{display:inline-flex;align-items:center;gap:8px;font-size:.65rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:{{ site.accent_color }};margin-bottom:16px;background:rgba(240,165,0,.1);padding:5px 12px;border-radius:2px;border:1px solid rgba(240,165,0,.25)}
+.product-price-big{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:{{ site.primary_color }};line-height:1;margin-bottom:4px}
+.product-price-big .old{font-family:'Barlow',sans-serif;font-size:1rem;color:var(--grey);text-decoration:line-through;margin-right:8px}
+.product-excl{font-family:'Barlow',sans-serif;font-size:.75rem;color:var(--grey);margin-bottom:20px}
+.product-desc{font-size:.95rem;font-weight:300;color:var(--dark-grey);line-height:1.8;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid rgba(10,22,40,.1)}
+.product-badges{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.info-badge{padding:5px 12px;border-radius:3px;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+
+/* ── ORDER OPTIONS FORM ── */
+.order-options{background:var(--offwhite);border-radius:8px;padding:24px;margin-top:4px}
+.order-options-title{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:{{ site.accent_color }};margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid rgba(240,165,0,.2)}
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.option-group{}
+.option-label{display:block;font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--dark-grey);margin-bottom:7px}
+.option-label .required{color:{{ site.primary_color }}}
+.option-select{width:100%;padding:11px 14px;border:2px solid rgba(10,22,40,.12);border-radius:5px;font-family:'Barlow',sans-serif;font-size:.9rem;color:var(--navy);background:#fff;outline:none;transition:border-color .2s,box-shadow .2s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238a8f9a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;cursor:pointer}
+.option-select:focus{border-color:{{ site.primary_color }};box-shadow:0 0 0 3px rgba(214,40,40,.1)}
+.option-select.is-invalid{border-color:{{ site.primary_color }};animation:shake .3s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.option-select option[value=""]{color:var(--grey)}
+
+/* ── QTY + BUTTONS ── */
+.cart-action-row{display:flex;gap:12px;align-items:stretch;flex-wrap:wrap}
+.qty-wrap{display:flex;align-items:center;background:#fff;border:2px solid rgba(10,22,40,.12);border-radius:5px;overflow:hidden}
+.qty-dec,.qty-inc{width:38px;height:100%;background:none;border:none;font-size:1.3rem;color:var(--grey);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
+.qty-dec:hover,.qty-inc:hover{background:var(--offwhite);color:var(--navy)}
+.qty-num{width:52px;border:none;text-align:center;font-family:'Barlow',sans-serif;font-size:1rem;font-weight:700;color:var(--navy);background:none;outline:none}
+.add-cart-btn{flex:1;min-width:160px;background:linear-gradient(135deg,{{ site.primary_color }},#e05050);color:#fff;border:none;padding:14px 20px;font-family:'Barlow',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border-radius:5px;transition:all .2s;box-shadow:0 3px 12px rgba(214,40,40,.28);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.add-cart-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(214,40,40,.4)}
+.quote-btn{background:transparent;border:2px solid rgba(10,22,40,.2);color:var(--navy);padding:14px 18px;font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border-radius:5px;transition:all .2s;text-decoration:none;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.quote-btn:hover{border-color:{{ site.accent_color }};color:{{ site.accent_color }}}
+
+/* size guide toggle */
+.size-guide-link{font-size:.72rem;color:{{ site.primary_color }};cursor:pointer;text-decoration:underline;margin-top:6px;display:inline-block;background:none;border:none;font-family:inherit;padding:0}
+.size-guide{display:none;margin-top:14px;background:#fff;border-radius:5px;padding:16px;border:1px solid rgba(10,22,40,.1);font-size:.8rem}
+.size-guide.open{display:block}
+.size-guide table{width:100%;border-collapse:collapse;font-size:.78rem}
+.size-guide th{background:{{ site.secondary_color }};color:#fff;padding:7px 10px;text-align:left;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase}
+.size-guide td{padding:7px 10px;border-bottom:1px solid rgba(10,22,40,.07);color:var(--dark-grey)}
+.size-guide tr:last-child td{border-bottom:none}
+
+/* delivery strip */
+.delivery-strip{display:flex;gap:20px;flex-wrap:wrap;margin-top:18px;padding:14px 18px;background:#fff;border-radius:5px;border:1px solid rgba(10,22,40,.08)}
+.ds-item{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--grey)}
+.ds-item strong{color:var(--dark-grey)}
+
+/* related */
+.related-section{padding:60px 48px;background:var(--offwhite)}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;max-width:1280px;margin:0 auto}
+
+@media(max-width:900px){.product-detail{grid-template-columns:1fr;padding:28px 20px;gap:32px}.options-grid{grid-template-columns:1fr}.related-section{padding:40px 20px}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header" style="padding:32px 48px 24px">
+  <div class="page-header-inner">
+    <div class="breadcrumb">
+      <a href="/">Home</a><span class="bc-sep">/</span>
+      <a href="/shop/">Shop</a><span class="bc-sep">/</span>
+      <a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a><span class="bc-sep">/</span>
+      <span>{{ product.name }}</span>
+    </div>
+  </div>
+</div>
+
+<div class="product-detail">
+
+  <!-- IMAGES -->
+  <div class="product-images">
+    <div class="main-img" id="mainImg">
+      {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}" id="mainImgEl"/>
+      {% else %}<span>{{ product.category.icon }}</span>{% endif %}
+    </div>
+    {% if product.image2 or product.image3 %}
+    <div class="product-thumbs">
+      {% if product.image %}<img src="{{ product.image.url }}" class="active" onclick="setImg(this)" alt="View 1"/>{% endif %}
+      {% if product.image2 %}<img src="{{ product.image2.url }}" onclick="setImg(this)" alt="View 2"/>{% endif %}
+      {% if product.image3 %}<img src="{{ product.image3.url }}" onclick="setImg(this)" alt="View 3"/>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- INFO + ORDER FORM -->
+  <div class="product-info">
+    <div class="product-cat-tag">{{ product.category.icon }} {{ product.category.name }}</div>
+    <h1>{{ product.name }}</h1>
+
+    <div class="product-badges">
+      {% if product.badge %}
+        <span class="product-badge badge-{{ product.badge }}" style="position:static;font-size:.7rem;padding:5px 12px">
+          {% if product.badge == 'new' %}New In{% elif product.badge == 'sale' %}Sale{% elif product.badge == 'combo' %}Combo{% elif product.badge == 'hot' %}🔥 Hot{% endif %}
+        </span>
+      {% endif %}
+      {% if product.includes_branding %}<span class="info-badge" style="background:rgba(39,174,96,.12);color:#1a6640">✓ Includes Branding</span>{% endif %}
+      {% if product.stock_note %}<span class="info-badge" style="background:rgba(240,165,0,.12);color:#7a5c00">{{ product.stock_note }}</span>{% endif %}
+    </div>
+
+    <div class="product-price-big">
+      {% if product.sale_price %}<span class="old">R{{ product.price }}</span>R{{ product.sale_price }}
+      {% else %}R{{ product.price }}{% endif %}
+    </div>
+    <div class="product-excl">Excluding VAT &nbsp;·&nbsp; Min. order: {{ product.min_qty }} unit{{ product.min_qty|pluralize }}</div>
+
+    {% if product.description %}<p class="product-desc">{{ product.description }}</p>{% endif %}
+
+    <!-- ── ORDER OPTIONS — size + colour + qty + add to cart all in one form ── -->
+    <form method="post" action="{% url 'cart_add' product.id %}" id="addToCartForm">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ product.get_absolute_url }}"/>
+
+      <div class="order-options">
+        <div class="order-options-title">Select Your Options</div>
+
+        <div class="options-grid">
+
+          <!-- SIZE — always shown -->
+          <div class="option-group">
+            <label class="option-label" for="sizeSelect">
+              Size <span class="required">*</span>
+            </label>
+            {% if product.sizes_list %}
+            <select name="size" id="sizeSelect" class="option-select" required>
+              <option value="">— Choose size —</option>
+              {% for s in product.sizes_list %}
+              <option value="{{ s }}">{{ s }}</option>
+              {% endfor %}
+              <option value="Mixed/TBC">Mixed sizes (specify in quote)</option>
+            </select>
+            {% else %}
+            <select name="size" id="sizeSelect" class="option-select" required>
+              <option value="">— Choose size —</option>
+              <option value="XS">XS</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="XXL">XXL</option>
+              <option value="XXXL">XXXL</option>
+              <option value="Mixed/TBC">Mixed sizes (specify in quote)</option>
+            </select>
+            {% endif %}
+            <button type="button" class="size-guide-link" onclick="toggleSizeGuide()">📏 Size guide</button>
+          </div>
+
+          <!-- COLOUR — always shown -->
+          <div class="option-group">
+            <label class="option-label" for="colourSelect">
+              Colour <span class="required">*</span>
+            </label>
+            {% if product.colours_list %}
+            <select name="colour" id="colourSelect" class="option-select" required>
+              <option value="">— Choose colour —</option>
+              {% for c in product.colours_list %}
+              <option value="{{ c }}">{{ c }}</option>
+              {% endfor %}
+              <option value="Custom/TBC">Custom colour (specify in quote)</option>
+            </select>
+            {% else %}
+            <select name="colour" id="colourSelect" class="option-select" required>
+              <option value="">— Choose colour —</option>
+              <option value="Red">Red</option>
+              <option value="Blue">Blue</option>
+              <option value="Black">Black</option>
+              <option value="White">White</option>
+              <option value="Green">Green</option>
+              <option value="Yellow">Yellow</option>
+              <option value="Navy">Navy</option>
+              <option value="Custom/TBC">Custom colour (specify in quote)</option>
+            </select>
+            {% endif %}
+          </div>
+
+        </div><!-- /options-grid -->
+
+        <!-- Size guide table (hidden by default) -->
+        <div class="size-guide" id="sizeGuide">
+          <table>
+            <thead><tr><th>Size</th><th>Chest (cm)</th><th>Length (cm)</th><th>Waist (cm)</th></tr></thead>
+            <tbody>
+              <tr><td>XS</td><td>84–88</td><td>68</td><td>70–74</td></tr>
+              <tr><td>S</td><td>88–92</td><td>70</td><td>74–78</td></tr>
+              <tr><td>M</td><td>92–96</td><td>72</td><td>78–82</td></tr>
+              <tr><td>L</td><td>96–102</td><td>74</td><td>82–88</td></tr>
+              <tr><td>XL</td><td>102–108</td><td>76</td><td>88–94</td></tr>
+              <tr><td>XXL</td><td>108–116</td><td>78</td><td>94–102</td></tr>
+              <tr><td>XXXL</td><td>116–124</td><td>80</td><td>102–110</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- QTY + ADD TO CART -->
+        <div class="cart-action-row">
+          <div class="qty-wrap">
+            <button type="button" class="qty-dec" onclick="changeQty(-1)">−</button>
+            <input type="number" name="qty" id="qtyField" value="{{ product.min_qty }}" min="{{ product.min_qty }}" class="qty-num"/>
+            <button type="button" class="qty-inc" onclick="changeQty(1)">+</button>
+          </div>
+          <button type="submit" class="add-cart-btn" onclick="return validateOptions()">
+            🛒 Add to Cart
+          </button>
+          <a href="{% url 'quote_request_product' product.id %}" class="quote-btn">⚡ Quote</a>
+        </div>
+
+      </div><!-- /order-options -->
+    </form>
+
+    <!-- Delivery strip -->
+    <div class="delivery-strip">
+      <div class="ds-item">🚚 <span><strong>Nationwide</strong> delivery</span></div>
+      <div class="ds-item">✅ <span><strong>Custom</strong> branding</span></div>
+      <div class="ds-item">📞 <a href="tel:{{ site.phone }}" style="color:{{ site.primary_color }}"><strong>Call</strong> for bulk pricing</a></div>
+      <div class="ds-item">💬 <a href="https://wa.me/{{ site.whatsapp_number }}" target="_blank" style="color:#25D366"><strong>WhatsApp</strong> us</a></div>
+    </div>
+
+  </div><!-- /product-info -->
+</div>
+
+{% if related %}
+<section class="related-section">
+  <div class="sec-head" style="padding-top:0">
+    <div class="sec-tag">More from {{ product.category.name }}</div>
+    <h2>Related Products</h2>
+  </div>
+  <div class="related-grid">
+    {% for p in related %}
+    <div class="product-card">
+      <a href="{{ p.get_absolute_url }}">
+        <div class="product-card-img" style="background:{{ p.category.bg_color }}">
+          {% if p.image %}<img src="{{ p.image.url }}" alt="{{ p.name }}"/>{% else %}<span style="font-size:5rem;opacity:.2">{{ p.category.icon }}</span>{% endif %}
+          {% if p.badge %}<span class="product-badge badge-{{ p.badge }}">{% if p.badge == 'new' %}New In{% elif p.badge == 'sale' %}Sale{% elif p.badge == 'combo' %}Combo{% endif %}</span>{% endif %}
+        </div>
+      </a>
+      <div class="product-card-body">
+        <div class="product-cat-label">{{ p.category.name }}</div>
+        <div class="product-name"><a href="{{ p.get_absolute_url }}" style="color:inherit">{{ p.name }}</a></div>
+        <div class="product-foot">
+          <div class="product-price">
+            {% if p.sale_price %}<span class="old-price">R{{ p.price }}</span>R{{ p.sale_price }}<span class="excl">excl. VAT</span>
+            {% else %}R{{ p.price }}<span class="excl">excl. VAT</span>{% endif %}
+          </div>
+          <a href="{{ p.get_absolute_url }}" class="product-add-btn" title="View product">→</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function setImg(el) {
+  var main = document.getElementById('mainImgEl');
+  if (main) main.src = el.src;
+  document.querySelectorAll('.product-thumbs img').forEach(function(i){ i.classList.remove('active'); });
+  el.classList.add('active');
+}
+
+function changeQty(delta) {
+  var f = document.getElementById('qtyField');
+  var min = parseInt(f.min) || 1;
+  f.value = Math.max(min, parseInt(f.value || min) + delta);
+}
+
+function toggleSizeGuide() {
+  document.getElementById('sizeGuide').classList.toggle('open');
+}
+
+function validateOptions() {
+  var size   = document.getElementById('sizeSelect').value;
+  var colour = document.getElementById('colourSelect').value;
+  var ok = true;
+  if (!size) {
+    document.getElementById('sizeSelect').classList.add('is-invalid');
+    setTimeout(function(){ document.getElementById('sizeSelect').classList.remove('is-invalid'); }, 600);
+    ok = false;
+  }
+  if (!colour) {
+    document.getElementById('colourSelect').classList.add('is-invalid');
+    setTimeout(function(){ document.getElementById('colourSelect').classList.remove('is-invalid'); }, 600);
+    ok = false;
+  }
+  if (!ok) {
+    // scroll to selects
+    document.getElementById('sizeSelect').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  return ok;
+}
+</script>
+{% endblock %}
