@@ -84,7 +84,7 @@
   <div class="product-images">
     <div class="main-img" id="mainImg">
       {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}" id="mainImgEl"/>
-      {% else %}<span>{{ product.category.icon }}</span>{% endif %}
+      {% else %}<span><i class="fa-solid {{ product.category.icon }}"></i></span>{% endif %}
     </div>
     {% if product.image2 or product.image3 %}
     <div class="product-thumbs">
@@ -97,16 +97,16 @@
 
   <!-- INFO + ORDER FORM -->
   <div class="product-info">
-    <div class="product-cat-tag">{{ product.category.icon }} {{ product.category.name }}</div>
+    <div class="product-cat-tag"><i class="fa-solid {{ product.category.icon }}"></i> {{ product.category.name }}</div>
     <h1>{{ product.name }}</h1>
 
     <div class="product-badges">
       {% if product.badge %}
         <span class="product-badge badge-{{ product.badge }}" style="position:static;font-size:.7rem;padding:5px 12px">
-          {% if product.badge == 'new' %}New In{% elif product.badge == 'sale' %}Sale{% elif product.badge == 'combo' %}Combo{% elif product.badge == 'hot' %}🔥 Hot{% endif %}
+          {% if product.badge == 'new' %}New In{% elif product.badge == 'sale' %}Sale{% elif product.badge == 'combo' %}Combo{% elif product.badge == 'hot' %}<i class="fa-solid fa-fire"></i> Hot{% endif %}
         </span>
       {% endif %}
-      {% if product.includes_branding %}<span class="info-badge" style="background:rgba(39,174,96,.12);color:#1a6640">✓ Includes Branding</span>{% endif %}
+      {% if product.includes_branding %}<span class="info-badge" style="background:rgba(39,174,96,.12);color:#1a6640"><i class="fa-solid fa-check"></i> Includes Branding</span>{% endif %}
       {% if product.stock_note %}<span class="info-badge" style="background:rgba(240,165,0,.12);color:#7a5c00">{{ product.stock_note }}</span>{% endif %}
     </div>
 
@@ -211,9 +211,9 @@
             <button type="button" class="qty-inc" onclick="changeQty(1)">+</button>
           </div>
           <button type="submit" class="add-cart-btn" onclick="return validateOptions()">
-            🛒 Add to Cart
+            <i class="fa-solid fa-cart-shopping"></i> Add to Cart
           </button>
-          <a href="{% url 'quote_request_product' product.id %}" class="quote-btn">⚡ Quote</a>
+          <a href="{% url 'quote_request_product' product.id %}" class="quote-btn"><i class="fa-solid fa-bolt"></i> Quote</a>
         </div>
 
       </div><!-- /order-options -->
@@ -221,10 +221,10 @@
 
     <!-- Delivery strip -->
     <div class="delivery-strip">
-      <div class="ds-item">🚚 <span><strong>Nationwide</strong> delivery</span></div>
-      <div class="ds-item">✅ <span><strong>Custom</strong> branding</span></div>
-      <div class="ds-item">📞 <a href="tel:{{ site.phone }}" style="color:{{ site.primary_color }}"><strong>Call</strong> for bulk pricing</a></div>
-      <div class="ds-item">💬 <a href="https://wa.me/{{ site.whatsapp_number }}" target="_blank" style="color:#25D366"><strong>WhatsApp</strong> us</a></div>
+      <div class="ds-item"><i class="fa-solid fa-truck"></i> <span><strong>Nationwide</strong> delivery</span></div>
+      <div class="ds-item"><i class="fa-solid fa-circle-check"></i> <span><strong>Custom</strong> branding</span></div>
+      <div class="ds-item"><i class="fa-solid fa-phone"></i> <a href="tel:{{ site.phone }}" style="color:{{ site.primary_color }}"><strong>Call</strong> for bulk pricing</a></div>
+      <div class="ds-item"><i class="fa-brands fa-whatsapp"></i> <a href="https://wa.me/{{ site.whatsapp_number }}" target="_blank" style="color:#25D366"><strong>WhatsApp</strong> us</a></div>
     </div>
 
   </div><!-- /product-info -->
@@ -241,7 +241,7 @@
     <div class="product-card">
       <a href="{{ p.get_absolute_url }}">
         <div class="product-card-img" style="background:{{ p.category.bg_color }}">
-          {% if p.image %}<img src="{{ p.image.url }}" alt="{{ p.name }}"/>{% else %}<span style="font-size:5rem;opacity:.2">{{ p.category.icon }}</span>{% endif %}
+          {% if p.image %}<img src="{{ p.image.url }}" alt="{{ p.name }}"/>{% else %}<span style="font-size:5rem;opacity:.2"><i class="fa-solid {{ p.category.icon }}"></i></span>{% endif %}
           {% if p.badge %}<span class="product-badge badge-{{ p.badge }}">{% if p.badge == 'new' %}New In{% elif p.badge == 'sale' %}Sale{% elif p.badge == 'combo' %}Combo{% endif %}</span>{% endif %}
         </div>
       </a>
@@ -253,7 +253,7 @@
             {% if p.sale_price %}<span class="old-price">R{{ p.price }}</span>R{{ p.sale_price }}<span class="excl">excl. VAT</span>
             {% else %}R{{ p.price }}<span class="excl">excl. VAT</span>{% endif %}
           </div>
-          <a href="{{ p.get_absolute_url }}" class="product-add-btn" title="View product">→</a>
+          <a href="{{ p.get_absolute_url }}" class="product-add-btn" title="View product"><i class="fa-solid fa-arrow-right"></i></a>
         </div>
       </div>
     </div>
