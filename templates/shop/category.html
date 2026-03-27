@@ -4,7 +4,7 @@
 <div class="page-header">
   <div class="page-header-inner">
     <div class="page-eyebrow">{{ category.eyebrow|default:"Shop" }}</div>
-    <h1>{{ category.icon }} {{ category.name }}</h1>
+    <h1><i class="fa-solid {{ category.icon }}"></i> {{ category.name }}</h1>
     {% if category.description %}<p>{{ category.description }}</p>{% endif %}
     <div class="breadcrumb"><a href="/">Home</a><span class="bc-sep">/</span><a href="/shop/">Shop</a><span class="bc-sep">/</span><span>{{ category.name }}</span></div>
   </div>
@@ -15,8 +15,8 @@
     <form method="get"><select name="sort" class="form-control" style="width:auto;display:inline-block;padding:9px 32px 9px 14px" onchange="this.form.submit()">
       <option value="" {% if not sort %}selected{% endif %}>Sort: Featured</option>
       <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest First</option>
-      <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Price: Low → High</option>
-      <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Price: High → Low</option>
+      <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Price: Low <i class="fa-solid fa-arrow-right"></i> High</option>
+      <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Price: High <i class="fa-solid fa-arrow-right"></i> Low</option>
     </select></form>
   </div>
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:22px">
@@ -24,8 +24,8 @@
     <div class="product-card">
       <a href="{{ product.get_absolute_url }}">
         <div class="product-card-img" style="background:{{ product.category.bg_color }}">
-          {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}"/>{% else %}<span style="font-size:5rem;opacity:.2">{{ product.category.icon }}</span>{% endif %}
-          {% if product.badge %}<span class="product-badge badge-{{ product.badge }}">{% if product.badge == 'new' %}New In{% elif product.badge == 'sale' %}Sale{% elif product.badge == 'combo' %}Combo{% elif product.badge == 'hot' %}🔥 Hot{% endif %}</span>{% endif %}
+          {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}"/>{% else %}<span style="font-size:5rem;opacity:.2"><i class="fa-solid {{ product.category.icon }}"></i></span>{% endif %}
+          {% if product.badge %}<span class="product-badge badge-{{ product.badge }}">{% if product.badge == 'new' %}New In{% elif product.badge == 'sale' %}Sale{% elif product.badge == 'combo' %}Combo{% elif product.badge == 'hot' %}<i class="fa-solid fa-fire"></i> Hot{% endif %}</span>{% endif %}
         </div>
       </a>
       <div class="product-card-body">
