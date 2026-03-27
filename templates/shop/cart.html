@@ -109,7 +109,7 @@
           <div class="cart-product">
             <div class="cart-thumb" style="background:{{ item.product.category.bg_color }}">
               {% if item.product.image %}<img src="{{ item.product.image.url }}" alt="{{ item.product.name }}"/>
-              {% else %}{{ item.product.category.icon }}{% endif %}
+              {% else %}<i class="fa-solid {{ item.product.category.icon }}"></i>{% endif %}
             </div>
             <div style="flex:1;min-width:0">
               <div class="cart-item-name">
@@ -121,7 +121,7 @@
               <!-- SIZE + COLOUR — always editable inline -->
               <div class="cart-options">
                 <select name="size_{{ item.product.id }}" class="cart-inline-select {% if not item.size %}missing{% endif %}" title="Size">
-                  <option value="">📐 Size?</option>
+                  <option value=""><i class="fa-solid fa-ruler"></i> Size?</option>
                   {% if item.product.sizes_list %}
                     {% for s in item.product.sizes_list %}
                     <option value="{{ s }}" {% if item.size == s %}selected{% endif %}>{{ s }}</option>
@@ -135,7 +135,7 @@
                 </select>
 
                 <select name="colour_{{ item.product.id }}" class="cart-inline-select {% if not item.colour %}missing{% endif %}" title="Colour">
-                  <option value="">🎨 Colour?</option>
+                  <option value=""><i class="fa-solid fa-palette"></i> Colour?</option>
                   {% if item.product.colours_list %}
                     {% for c in item.product.colours_list %}
                     <option value="{{ c }}" {% if item.colour == c %}selected{% endif %}>{{ c }}</option>
@@ -163,19 +163,19 @@
           <div class="cart-subtotal">R{{ item.subtotal|floatformat:2 }}<small>excl. VAT</small></div>
 
           <!-- Remove -->
-          <a href="{% url 'cart_remove' item.product.id %}" class="remove-btn" title="Remove">✕</a>
+          <a href="{% url 'cart_remove' item.product.id %}" class="remove-btn" title="Remove"><i class="fa-solid fa-xmark"></i></a>
         </div>
         {% endfor %}
 
         <div class="cart-footer-row">
-          <a href="/shop/" class="btn btn-outline-dark btn-sm">← Continue Shopping</a>
-          <button type="submit" class="btn btn-accent btn-sm">↺ Update Cart &amp; Options</button>
+          <a href="/shop/" class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-arrow-left"></i> Continue Shopping</a>
+          <button type="submit" class="btn btn-accent btn-sm"><i class="fa-solid fa-rotate"></i> Update Cart &amp; Options</button>
         </div>
       </div>
     </form>
 
     <div class="info-box">
-      <h3>ℹ️ How ordering works</h3>
+      <h3><i class="fa-solid fa-circle-info"></i> How ordering works</h3>
       <p>Your cart is a <strong>quote basket</strong>. Every garment is <strong>custom branded to your club or company</strong> — orders are handled personally by our team.</p>
       <p>Once ready, click <strong>"Request a Quote"</strong> or <strong>"Order via WhatsApp"</strong> and we will:</p>
       <ol>
@@ -195,7 +195,7 @@
       {% for item in items %}
       <div class="sum-line">
         <span class="lbl">
-          {{ item.product.name|truncatechars:22 }} ×{{ item.qty }}
+          {{ item.product.name|truncatechars:22 }} <i class="fa-solid fa-xmark"></i>{{ item.qty }}
           {% if item.size %}<br/><small style="color:var(--accent)">{{ item.size }}{% if item.colour %} / {{ item.colour }}{% endif %}</small>{% endif %}
         </span>
         <span class="val">R{{ item.subtotal|floatformat:2 }}</span>
@@ -209,9 +209,9 @@
       <p class="sum-note">Delivery confirmed on your quote based on location and order size.</p>
 
       <div class="sum-actions">
-        <a href="{% url 'quote_request' %}" class="btn-quote">⚡ Request a Quote</a>
-        <a href="https://wa.me/{{ site.whatsapp_number }}?text={{ wa_message }}" class="btn-whatsapp" target="_blank" rel="noopener">💬 Order via WhatsApp</a>
-        <a href="/shop/" class="btn-keep">← Keep Shopping</a>
+        <a href="{% url 'quote_request' %}" class="btn-quote"><i class="fa-solid fa-bolt"></i> Request a Quote</a>
+        <a href="https://wa.me/{{ site.whatsapp_number }}?text={{ wa_message }}" class="btn-whatsapp" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Order via WhatsApp</a>
+        <a href="/shop/" class="btn-keep"><i class="fa-solid fa-arrow-left"></i> Keep Shopping</a>
       </div>
 
       <div class="next-steps">
@@ -226,10 +226,10 @@
 
 {% else %}
   <div class="empty-cart">
-    <span class="empty-icon">🛒</span>
+    <span class="empty-icon"><i class="fa-solid fa-cart-shopping"></i></span>
     <h2>Your Cart is Empty</h2>
     <p>Browse our teamwear range and add products to get started.</p>
-    <a href="/shop/" class="btn btn-primary btn-lg">Shop Teamwear →</a>
+    <a href="/shop/" class="btn btn-primary btn-lg">Shop Teamwear <i class="fa-solid fa-arrow-right"></i></a>
   </div>
 {% endif %}
 </div>
