@@ -56,7 +56,7 @@
 .cat-card.wide{grid-column:span 2}
 .cat-card-bg{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .55s ease}
 .cat-card:hover .cat-card-bg{transform:scale(1.06)}
-.cat-icon-bg{position:absolute;right:22px;bottom:22px;font-size:7rem;opacity:.1;transition:transform .55s ease,opacity .3s;pointer-events:none;user-select:none}
+.cat-icon-bg{position:absolute;right:22px;bottom:22px;font-size:6rem;opacity:.1;transition:transform .55s ease,opacity .3s;pointer-events:none;user-select:none;line-height:1}
 .cat-card:hover .cat-icon-bg{transform:scale(1.12) rotate(-6deg);opacity:.18}
 .cat-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,22,40,.92) 0%,rgba(10,22,40,.18) 55%,transparent 100%);transition:background .3s}
 .cat-card:hover .cat-overlay{background:linear-gradient(to top,rgba(10,22,40,.96) 0%,rgba(214,40,40,.1) 100%)}
@@ -160,9 +160,9 @@
       <h1 class="slide-heading">{{ slide.heading }}</h1>
       {% if slide.subheading %}<p class="slide-sub">{{ slide.subheading }}</p>{% endif %}
       <div class="slide-btns">
-        <a href="{{ slide.cta_url }}" class="btn btn-primary btn-lg">{{ slide.cta_text }} →</a>
+        <a href="{{ slide.cta_url }}" class="btn btn-primary btn-lg">{{ slide.cta_text }} <i class="fa-solid fa-arrow-right"></i></a>
         {% if site.hero_cta2_url and site.hero_cta2_url != '#' %}
-        <a href="{{ site.hero_cta2_url }}" class="btn btn-outline btn-lg" target="_blank">📥 {{ site.hero_cta2_text }}</a>
+        <a href="{{ site.hero_cta2_url }}" class="btn btn-outline btn-lg" target="_blank"><i class="fa-solid fa-file-arrow-down"></i> {{ site.hero_cta2_text }}</a>
         {% endif %}
       </div>
     </div>
@@ -196,9 +196,9 @@
 <div class="cat-band">
   {% if site.catalogue_banner %}<img src="{{ site.catalogue_banner.url }}" class="cat-band-img" alt="Catalogue"/>{% endif %}
   <div class="cat-band-txt">
-    <h3>📚 2026 Catalogue Now Available</h3>
+    <h3><i class="fa-solid fa-book-open"></i> 2026 Catalogue Now Available</h3>
     <p>Browse our complete range of teamwear, kits, tracksuits and accessories.</p>
-    <a href="{{ site.catalogue_pdf.url }}" class="btn btn-accent" target="_blank">Download Catalogue →</a>
+    <a href="{{ site.catalogue_pdf.url }}" class="btn btn-accent" target="_blank">Download Catalogue <i class="fa-solid fa-arrow-right"></i></a>
   </div>
 </div>
 {% endif %}
@@ -213,18 +213,18 @@
   <a href="{{ cat.get_absolute_url }}" class="cat-card {% if forloop.first or forloop.counter == 5 %}wide{% endif %}">
     {% if cat.image %}<div class="cat-card-bg" style="background-image:url('{{ cat.image.url }}');background-color:{{ cat.bg_color }}"></div>
     {% else %}<div class="cat-card-bg" style="background:linear-gradient(145deg,{{ cat.bg_color }},#0d2240)"></div>{% endif %}
-    <div class="cat-icon-bg">{{ cat.icon }}</div>
+    <div class="cat-icon-bg"><i class="fa-solid {{ cat.icon }}"></i></div>
     <div class="cat-overlay"></div>
     <div class="cat-info">
       {% if cat.eyebrow %}<span class="cat-eyebrow-lbl">{{ cat.eyebrow }}</span>{% endif %}
       <div class="cat-title">{{ cat.name }}</div>
-      <div class="cat-cta-link">Shop Now →</div>
+      <div class="cat-cta-link">Shop Now <i class="fa-solid fa-arrow-right"></i></div>
       <div class="cat-pcount">{{ cat.products.count }} products</div>
     </div>
   </a>
   {% empty %}
   <div style="grid-column:1/-1;text-align:center;padding:60px 24px;color:var(--grey)">
-    <p>No categories yet — <a href="/admin/store/category/add/" style="color:{{ site.primary_color }}">add some in admin →</a></p>
+    <p>No categories yet — <a href="/admin/store/category/add/" style="color:{{ site.primary_color }}">add some in admin <i class="fa-solid fa-arrow-right"></i></a></p>
   </div>
   {% endfor %}
 </div>
@@ -241,8 +241,8 @@
       <a href="{{ product.get_absolute_url }}">
         <div class="product-card-img" style="background:{{ product.category.bg_color }}">
           {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}"/>
-          {% else %}<span style="font-size:5rem;opacity:.2">{{ product.category.icon }}</span>{% endif %}
-          {% if product.badge %}<span class="product-badge badge-{{ product.badge }}">{% if product.badge == 'new' %}New In{% elif product.badge == 'sale' %}Sale{% elif product.badge == 'combo' %}Combo{% elif product.badge == 'hot' %}🔥 Hot{% endif %}</span>{% endif %}
+          {% else %}<span style="font-size:5rem;opacity:.2"><i class="fa-solid {{ product.category.icon }}"></i></span>{% endif %}
+          {% if product.badge %}<span class="product-badge badge-{{ product.badge }}">{% if product.badge == 'new' %}New In{% elif product.badge == 'sale' %}Sale{% elif product.badge == 'combo' %}Combo{% elif product.badge == 'hot' %}<i class="fa-solid fa-fire"></i> Hot{% endif %}</span>{% endif %}
         </div>
       </a>
       <div class="product-card-body">
@@ -259,7 +259,7 @@
     </div>
     {% endfor %}
   </div>
-  <div style="text-align:center;margin-top:40px"><a href="/shop/" class="btn btn-outline-dark btn-lg">View All Products →</a></div>
+  <div style="text-align:center;margin-top:40px"><a href="/shop/" class="btn btn-outline-dark btn-lg">View All Products <i class="fa-solid fa-arrow-right"></i></a></div>
 </section>
 {% endif %}
 
@@ -283,8 +283,8 @@
 <div class="cta-band">
   <div class="cta-txt"><h2>Need a Custom <span>Team Quote?</span></h2><p>Large order? Mixed sizes? School or club package? We'll sort it out — just get in touch.</p></div>
   <div class="cta-btns-row">
-    <a href="{% url 'quote_request' %}" class="btn-white">⚡ Get a Quote</a>
-    <a href="https://wa.me/{{ site.whatsapp_number }}" class="btn-wa" target="_blank">💬 WhatsApp Us</a>
+    <a href="{% url 'quote_request' %}" class="btn-white"><i class="fa-solid fa-bolt"></i> Get a Quote</a>
+    <a href="https://wa.me/{{ site.whatsapp_number }}" class="btn-wa" target="_blank"><i class="fa-brands fa-whatsapp"></i> WhatsApp Us</a>
   </div>
 </div>
 
@@ -294,7 +294,7 @@
   <div class="testimonials-grid">
     {% for t in testimonials %}
     <div class="t-card">
-      <div class="t-stars">{% for i in "12345" %}{% if forloop.counter <= t.rating %}⭐{% endif %}{% endfor %}</div>
+      <div class="t-stars">{% for i in "12345" %}{% if forloop.counter <= t.rating %}<i class="fa-solid fa-star"></i>{% endif %}{% endfor %}</div>
       <p class="t-text">{{ t.text }}</p>
       <div class="t-author">
         {% if t.photo %}<img src="{{ t.photo.url }}" class="t-avatar" alt="{{ t.name }}"/>
@@ -318,7 +318,7 @@
     </a>
     {% endfor %}
   </div>
-  <div style="text-align:center;margin-top:32px"><a href="{% url 'gallery' %}" class="btn btn-outline">View Full Gallery →</a></div>
+  <div style="text-align:center;margin-top:32px"><a href="{% url 'gallery' %}" class="btn btn-outline">View Full Gallery <i class="fa-solid fa-arrow-right"></i></a></div>
 </section>
 {% endif %}
 {% endblock %}
