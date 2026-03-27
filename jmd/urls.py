@@ -13,4 +13,4 @@ urlpatterns = [
     path('shop/', include('store.urls')),
     # Serve media files in both DEBUG and production
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
-]MEDIA_ROOT)
+]
