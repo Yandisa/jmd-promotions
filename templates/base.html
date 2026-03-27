@@ -6,6 +6,7 @@
 <title>{% block title %}{{ site.meta_title }}{% endblock %}</title>
 <meta name="description" content="{{ site.meta_description }}"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet"/>
 {% if site.favicon %}<link rel="icon" href="{{ site.favicon.url }}"/>{% endif %}
@@ -165,16 +166,33 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;back
 .mobile-nav-links a{display:block;color:rgba(245,245,240,.85);font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07);transition:color .15s}
 .mobile-nav-links a:hover{color:{{ site.accent_color }}}
 .mobile-nav-sub a{font-size:1rem;padding:10px 0 10px 20px;color:rgba(245,245,240,.6)}
+/* Font Awesome inline sizing */
+.fa-solid, .fa-brands, .fa-regular {
+    font-size: inherit;
+    line-height: inherit;
+    vertical-align: middle;
+}
+/* footer social icons */
+.social-link .fa-brands,
+.social-link .fa-solid { font-size: .9rem; }
+/* nav icons */
+.dropdown a .fa-solid { font-size: .8rem; opacity: .75; }
+/* topbar icons */ 
+.topbar .fa-solid { font-size: .75rem; }
+/* cart icon */
+.cart-btn .fa-solid { font-size: .85rem; }
+/* stat items */
+.stat-item .fa-solid { font-size: 1rem; }
 </style>
 {% block extra_css %}{% endblock %}
 </head>
 <body>
 
 <div class="topbar">
-  <div>📍 {{ site.address }} &nbsp;·&nbsp; <a href="mailto:{{ site.email }}">{{ site.email }}</a></div>
+  <div><i class="fa-solid fa-location-dot"></i> {{ site.address }} &nbsp;·&nbsp; <a href="mailto:{{ site.email }}">{{ site.email }}</a></div>
   <div class="topbar-right">
-    <a href="#">⏱ {{ site.hours }}</a>
-    <a href="tel:{{ site.phone }}">📞 {{ site.phone }}</a>
+    <a href="#"><i class="fa-solid fa-clock"></i> {{ site.hours }}</a>
+    <a href="tel:{{ site.phone }}"><i class="fa-solid fa-phone"></i> {{ site.phone }}</a>
   </div>
 </div>
 
@@ -188,20 +206,20 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;back
     <div class="nav-item {% if request.resolver_match.url_name == 'shop' or request.resolver_match.url_name == 'category_detail' %}active{% endif %}">
       <a href="/shop/">Shop Teamwear <span class="nav-arrow">▾</span></a>
       <div class="dropdown">
-        {% for cat in categories %}<a href="{{ cat.get_absolute_url }}"><span>{{ cat.icon }}</span> {{ cat.name }}</a>{% endfor %}
+        {% for cat in categories %}<a href="{{ cat.get_absolute_url }}"><span><i class="fa-solid {{ cat.icon }}"></i></span> {{ cat.name }}</a>{% endfor %}
       </div>
     </div>
     <div class="nav-item {% if request.resolver_match.url_name == 'how_to_order' %}active{% endif %}"><a href="{% url 'how_to_order' %}">How to Order</a></div>
     <div class="nav-item {% if request.resolver_match.url_name == 'gallery' %}active{% endif %}"><a href="{% url 'gallery' %}">Gallery</a></div>
     <div class="nav-item {% if request.resolver_match.url_name == 'about' %}active{% endif %}"><a href="{% url 'about' %}">About Us</a></div>
     <div class="nav-item {% if request.resolver_match.url_name == 'contact' %}active{% endif %}"><a href="{% url 'contact' %}">Contact</a></div>
-    <div class="nav-item"><a href="{% url 'quote_request' %}" style="color:{{ site.accent_color }}">⚡ Get a Quote</a></div>
+    <div class="nav-item"><a href="{% url 'quote_request' %}" style="color:{{ site.accent_color }}"><i class="fa-solid fa-bolt"></i> Get a Quote</a></div>
   </nav>
   <div class="header-right">
     <form class="header-search" action="/shop/" method="get">
-      <span>🔍</span><input type="text" name="q" placeholder="Search products…" value="{{ request.GET.q }}"/>
+      <span><i class="fa-solid fa-magnifying-glass"></i></span><input type="text" name="q" placeholder="Search products…" value="{{ request.GET.q }}"/>
     </form>
-    <a href="{% url 'cart' %}" class="cart-btn">🛒 Cart {% if cart_count > 0 %}<span class="cart-count">{{ cart_count }}</span>{% endif %}</a>
+    <a href="{% url 'cart' %}" class="cart-btn"><i class="fa-solid fa-cart-shopping"></i> Cart {% if cart_count > 0 %}<span class="cart-count">{{ cart_count }}</span>{% endif %}</a>
     <button class="mobile-btn" onclick="document.getElementById('mobile-nav').classList.add('open')"><span></span><span></span><span></span></button>
   </div>
 </header>
@@ -213,22 +231,22 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;back
 </div></div></div>
 {% endif %}
 
-{% if messages %}<div class="messages-container">{% for msg in messages %}<div class="message {{ msg.tags }}">{% if msg.tags == 'success' %}✅{% else %}ℹ️{% endif %} {{ msg }}</div>{% endfor %}</div>{% endif %}
+{% if messages %}<div class="messages-container">{% for msg in messages %}<div class="message {{ msg.tags }}">{% if msg.tags == 'success' %}<i class="fa-solid fa-circle-check"></i>{% else %}<i class="fa-solid fa-circle-info"></i>{% endif %} {{ msg }}</div>{% endfor %}</div>{% endif %}
 
 <div id="mobile-nav">
   <div class="mobile-nav-header">
     <div class="logo" style="gap:10px"><div class="logo-badge">{{ site.site_name|slice:":3"|upper }}</div><span style="color:var(--white)">{{ site.site_name }}</span></div>
-    <button class="mobile-nav-close" onclick="document.getElementById('mobile-nav').classList.remove('open')">✕</button>
+    <button class="mobile-nav-close" onclick="document.getElementById('mobile-nav').classList.remove('open')"><i class="fa-solid fa-xmark"></i></button>
   </div>
   <div class="mobile-nav-links">
     <a href="/shop/" onclick="document.getElementById('mobile-nav').classList.remove('open')">Shop Teamwear</a>
-    <div class="mobile-nav-sub">{% for cat in categories %}<a href="{{ cat.get_absolute_url }}" onclick="document.getElementById('mobile-nav').classList.remove('open')">{{ cat.icon }} {{ cat.name }}</a>{% endfor %}</div>
+    <div class="mobile-nav-sub">{% for cat in categories %}<a href="{{ cat.get_absolute_url }}" onclick="document.getElementById('mobile-nav').classList.remove('open')"><i class="fa-solid {{ cat.icon }}"></i> {{ cat.name }}</a>{% endfor %}</div>
     <a href="{% url 'how_to_order' %}" onclick="document.getElementById('mobile-nav').classList.remove('open')">How to Order</a>
     <a href="{% url 'gallery' %}" onclick="document.getElementById('mobile-nav').classList.remove('open')">Gallery</a>
     <a href="{% url 'about' %}" onclick="document.getElementById('mobile-nav').classList.remove('open')">About Us</a>
     <a href="{% url 'contact' %}" onclick="document.getElementById('mobile-nav').classList.remove('open')">Contact</a>
-    <a href="{% url 'quote_request' %}" style="color:{{ site.accent_color }}" onclick="document.getElementById('mobile-nav').classList.remove('open')">⚡ Get a Quote</a>
-    <a href="{% url 'cart' %}" onclick="document.getElementById('mobile-nav').classList.remove('open')">🛒 Cart ({{ cart_count }})</a>
+    <a href="{% url 'quote_request' %}" style="color:{{ site.accent_color }}" onclick="document.getElementById('mobile-nav').classList.remove('open')"><i class="fa-solid fa-bolt"></i> Get a Quote</a>
+    <a href="{% url 'cart' %}" onclick="document.getElementById('mobile-nav').classList.remove('open')"><i class="fa-solid fa-cart-shopping"></i> Cart ({{ cart_count }})</a>
   </div>
 </div>
 
@@ -243,33 +261,33 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;back
       </div>
       <p>{{ site.footer_about }}</p>
       <div class="footer-social">
-        {% if site.facebook_url %}<a href="{{ site.facebook_url }}" class="social-link" target="_blank">📘</a>{% endif %}
-        {% if site.instagram_url %}<a href="{{ site.instagram_url }}" class="social-link" target="_blank">📸</a>{% endif %}
-        {% if site.twitter_url %}<a href="{{ site.twitter_url }}" class="social-link" target="_blank">🐦</a>{% endif %}
-        {% if site.youtube_url %}<a href="{{ site.youtube_url }}" class="social-link" target="_blank">▶️</a>{% endif %}
-        <a href="https://wa.me/{{ site.whatsapp_number }}" class="social-link" target="_blank">💬</a>
+        {% if site.facebook_url %}<a href="{{ site.facebook_url }}" class="social-link" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>{% endif %}
+        {% if site.instagram_url %}<a href="{{ site.instagram_url }}" class="social-link" target="_blank"><i class="fa-brands fa-instagram"></i></a>{% endif %}
+        {% if site.twitter_url %}<a href="{{ site.twitter_url }}" class="social-link" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>{% endif %}
+        {% if site.youtube_url %}<a href="{{ site.youtube_url }}" class="social-link" target="_blank"><i class="fa-brands fa-youtube"></i></a>{% endif %}
+        <a href="https://wa.me/{{ site.whatsapp_number }}" class="social-link" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
       </div>
     </div>
-    <div class="footer-col"><h4>Shop</h4><ul>{% for cat in categories %}<li><a href="{{ cat.get_absolute_url }}">{{ cat.icon }} {{ cat.name }}</a></li>{% endfor %}</ul></div>
+    <div class="footer-col"><h4>Shop</h4><ul>{% for cat in categories %}<li><a href="{{ cat.get_absolute_url }}"><i class="fa-solid {{ cat.icon }}"></i> {{ cat.name }}</a></li>{% endfor %}</ul></div>
     <div class="footer-col"><h4>Quick Links</h4><ul>
       <li><a href="/">Home</a></li><li><a href="/shop/">All Products</a></li>
       <li><a href="{% url 'how_to_order' %}">How to Order</a></li><li><a href="{% url 'gallery' %}">Gallery</a></li>
       <li><a href="{% url 'about' %}">About Us</a></li><li><a href="{% url 'quote_request' %}">Get a Quote</a></li>
       <li><a href="{% url 'contact' %}">Contact Us</a></li>
-      {% if site.catalogue_pdf %}<li><a href="{{ site.catalogue_pdf.url }}" target="_blank">📥 Download Catalogue</a></li>{% endif %}
+      {% if site.catalogue_pdf %}<li><a href="{{ site.catalogue_pdf.url }}" target="_blank"><i class="fa-solid fa-file-arrow-down"></i> Download Catalogue</a></li>{% endif %}
     </ul></div>
     <div class="footer-col"><h4>Contact</h4><ul>
-      <li><a href="#">📍 {{ site.address }}</a></li>
-      <li><a href="tel:{{ site.phone }}">📞 {{ site.phone }}</a></li>
-      <li><a href="mailto:{{ site.email }}">✉️ {{ site.email }}</a></li>
-      <li><a href="https://wa.me/{{ site.whatsapp_number }}" target="_blank">💬 WhatsApp Us</a></li>
-      <li><a href="#">⏱ {{ site.hours }}</a></li>
+      <li><a href="#"><i class="fa-solid fa-location-dot"></i> {{ site.address }}</a></li>
+      <li><a href="tel:{{ site.phone }}"><i class="fa-solid fa-phone"></i> {{ site.phone }}</a></li>
+      <li><a href="mailto:{{ site.email }}"><i class="fa-solid fa-envelope"></i> {{ site.email }}</a></li>
+      <li><a href="https://wa.me/{{ site.whatsapp_number }}" target="_blank"><i class="fa-brands fa-whatsapp"></i> WhatsApp Us</a></li>
+      <li><a href="#"><i class="fa-solid fa-clock"></i> {{ site.hours }}</a></li>
     </ul></div>
   </div>
   <div class="footer-bottom"><span>© {{ site.footer_copyright }}</span><span>Built with care by <a href="https://www.ygengineering.co.za" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;opacity:1" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='inherit'">YG Engineering</a></span></div>
 </footer>
 
-<a href="https://wa.me/{{ site.whatsapp_number }}" class="wa-float" target="_blank" title="Chat on WhatsApp">💬</a>
+<a href="https://wa.me/{{ site.whatsapp_number }}" class="wa-float" target="_blank" title="Chat on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
 {% block extra_js %}{% endblock %}
 </body>
 </html>
