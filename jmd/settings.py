@@ -3,7 +3,7 @@ from decouple import config, Csv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ── CORE ────────────────────────────────────────────────────────────────────#
+# ── CORE ──────────────────────────────────────────────────────────────────────
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-me-in-production')
 DEBUG      = config('DEBUG', default=False, cast=bool)
 
@@ -19,6 +19,7 @@ CSRF_TRUSTED_ORIGINS = config(
     cast=Csv()
 )
 
+# ── APPS ──────────────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -30,6 +31,7 @@ INSTALLED_APPS = [
     'store',
 ]
 
+# ── MIDDLEWARE ────────────────────────────────────────────────────────────────
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',          # serve static files
@@ -64,7 +66,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'jmd.wsgi.application'
 
-
+# ── DATABASE — PostgreSQL via Coolify env vars ────────────────────────────────
 DATABASES = {
     'default': {
         'ENGINE':   'django.db.backends.postgresql',
@@ -77,7 +79,7 @@ DATABASES = {
     }
 }
 
-
+# ── AUTH ──────────────────────────────────────────────────────────────────────
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -85,13 +87,13 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-
+# ── LOCALISATION ──────────────────────────────────────────────────────────────
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE     = 'Africa/Johannesburg'
 USE_I18N      = True
 USE_TZ        = True
 
-
+# ── STATIC & MEDIA ───────────────────────────────────────────────────────────
 STATIC_URL  = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
@@ -117,10 +119,16 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL  = config('DEFAULT_FROM_EMAIL',  default='noreply@jmdpromotions.co.za')
 
 # ── SECURITY (enabled when DEBUG=False) ──────────────────────────────────────
+# Only enforce HTTPS cookies when actually behind HTTPS
+# Set HTTPS=True in Coolify env when you add a real domain with SSL
+HTTPS = config('HTTPS', default=False, cast=bool)
+
 if not DEBUG:
-    SECURE_PROXY_SSL_HEADER      = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SESSION_COOKIE_SECURE        = True
-    CSRF_COOKIE_SECURE           = True
-    SECURE_BROWSER_XSS_FILTER    = True
-    SECURE_CONTENT_TYPE_NOSNIFF  = True
-    X_FRAME_OPTIONS              = 'DENY'
+    SECURE_BROWSER_XSS_FILTER   = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS             = 'DENY'
+
+if HTTPS:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE   = True
+    CSRF_COOKIE_SECURE      = True
