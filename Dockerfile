@@ -23,15 +23,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY --from=builder /install /usr/local
 
-# Create non-root user WITH a home directory (fixes /nonexistent permission error)
+# Create non-root user with a real home directory
+# python:3.12-slim uses Debian's adduser — no --create-home flag needed,
+# home is created by default when --home is specified without --no-create-home
 RUN addgroup --system jmd && \
-    adduser --system --ingroup jmd --home /home/jmd --create-home jmd
+    adduser --system --ingroup jmd --home /home/jmd jmd
 
 WORKDIR /app
 
 COPY --chown=jmd:jmd . .
 
-# Ensure static dir exists even if empty, and create writable dirs
 RUN mkdir -p /app/static /app/media /app/staticfiles && \
     chown -R jmd:jmd /app/static /app/media /app/staticfiles
 
@@ -40,7 +41,5 @@ RUN chmod +x entrypoint.sh
 USER jmd
 
 EXPOSE 8000
-
-# NO HEALTHCHECK in Dockerfile — disable it in Coolify UI instead
 
 ENTRYPOINT ["./entrypoint.sh"]
